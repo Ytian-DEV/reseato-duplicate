@@ -1,0 +1,235 @@
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Mail, Lock, User, Phone, ArrowRight, Store, Users } from 'lucide-react';
+import { Input } from '../../components/common/Input';
+import { Button } from '../../components/common/Button';
+import authService from '../../services/authService';
+import { UserRole } from '../../../../shared/types';
+import toast, { Toaster } from 'react-hot-toast';
+
+export const RegisterPage: React.FC = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    firstName: '',
+    lastName: '',
+    phone: '',
+    role: UserRole.CUSTOMER as UserRole,
+  });
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<any>({});
+
+  const handleChange = (field: string, value: string) => {
+    setFormData({ ...formData, [field]: value });
+    setErrors({ ...errors, [field]: '' });
+  };
+
+  const validate = () => {
+    const newErrors: any = {};
+    
+    if (!formData.email) newErrors.email = 'Email is required';
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
+    
+    if (!formData.password) newErrors.password = 'Password is required';
+    else if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
+    
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+    
+    if (!formData.firstName) newErrors.firstName = 'First name is required';
+    if (!formData.lastName) newErrors.lastName = 'Last name is required';
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validate()) return;
+
+    try {
+      setLoading(true);
+      await authService.register({
+        email: formData.email,
+        password: formData.password,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phone,
+        role: formData.role,
+      });
+      
+      toast.success('Registration successful!');
+      
+      // Redirect based on role
+      if (formData.role === UserRole.VENDOR) {
+        navigate('/vendor/dashboard');
+      } else {
+        navigate('/');
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Registration failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50 flex items-center justify-center p-4 py-12">
+      <Toaster position="top-center" />
+      
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-2xl"
+      >
+        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <Link to="/" className="inline-flex items-center space-x-2 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/30">
+                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+              <span className="text-2xl font-bold gradient-text">RESEATO</span>
+            </Link>
+            <h3 className="text-3xl font-bold text-neutral-900 mb-2">Create Account</h3>
+            <p className="text-neutral-600">Join us and start reserving tables today</p>
+          </div>
+
+          {/* Role Selection */}
+          <div className="mb-8">
+            <label className="block text-sm font-medium text-neutral-700 mb-3">I am a...</label>
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => handleChange('role', UserRole.CUSTOMER)}
+                className={`
+                  p-4 rounded-xl border-2 transition-all duration-200
+                  ${formData.role === UserRole.CUSTOMER
+                    ? 'border-primary-500 bg-primary-50'
+                    : 'border-neutral-200 hover:border-neutral-300'
+                  }
+                `}
+              >
+                <Users className={`w-8 h-8 mx-auto mb-2 ${formData.role === UserRole.CUSTOMER ? 'text-primary-600' : 'text-neutral-400'}`} />
+                <div className={`font-semibold ${formData.role === UserRole.CUSTOMER ? 'text-primary-600' : 'text-neutral-700'}`}>
+                  Customer
+                </div>
+                <div className="text-xs text-neutral-500 mt-1">Reserve tables</div>
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => handleChange('role', UserRole.VENDOR)}
+                className={`
+                  p-4 rounded-xl border-2 transition-all duration-200
+                  ${formData.role === UserRole.VENDOR
+                    ? 'border-primary-500 bg-primary-50'
+                    : 'border-neutral-200 hover:border-neutral-300'
+                  }
+                `}
+              >
+                <Store className={`w-8 h-8 mx-auto mb-2 ${formData.role === UserRole.VENDOR ? 'text-primary-600' : 'text-neutral-400'}`} />
+                <div className={`font-semibold ${formData.role === UserRole.VENDOR ? 'text-primary-600' : 'text-neutral-700'}`}>
+                  Restaurant Owner
+                </div>
+                <div className="text-xs text-neutral-500 mt-1">Manage bookings</div>
+              </button>
+            </div>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                label="First Name"
+                type="text"
+                value={formData.firstName}
+                onChange={(e) => handleChange('firstName', e.target.value)}
+                error={errors.firstName}
+                leftIcon={<User className="w-5 h-5" />}
+              />
+              
+              <Input
+                label="Last Name"
+                type="text"
+                value={formData.lastName}
+                onChange={(e) => handleChange('lastName', e.target.value)}
+                error={errors.lastName}
+                leftIcon={<User className="w-5 h-5" />}
+              />
+            </div>
+
+            <Input
+              label="Email Address"
+              type="email"
+              value={formData.email}
+              onChange={(e) => handleChange('email', e.target.value)}
+              error={errors.email}
+              leftIcon={<Mail className="w-5 h-5" />}
+            />
+
+            <Input
+              label="Phone Number (Optional)"
+              type="tel"
+              value={formData.phone}
+              onChange={(e) => handleChange('phone', e.target.value)}
+              leftIcon={<Phone className="w-5 h-5" />}
+            />
+
+            <Input
+              label="Password"
+              type="password"
+              value={formData.password}
+              onChange={(e) => handleChange('password', e.target.value)}
+              error={errors.password}
+              leftIcon={<Lock className="w-5 h-5" />}
+            />
+
+            <Input
+              label="Confirm Password"
+              type="password"
+              value={formData.confirmPassword}
+              onChange={(e) => handleChange('confirmPassword', e.target.value)}
+              error={errors.confirmPassword}
+              leftIcon={<Lock className="w-5 h-5" />}
+            />
+
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              fullWidth
+              isLoading={loading}
+              rightIcon={<ArrowRight className="w-5 h-5" />}
+            >
+              Create Account
+            </Button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-neutral-600">
+              Already have an account?{' '}
+              <Link to="/login" className="text-primary-600 hover:text-primary-700 font-semibold">
+                Sign in
+              </Link>
+            </p>
+          </div>
+
+          <div className="mt-8 pt-6 border-t border-neutral-200">
+            <p className="text-xs text-center text-neutral-500">
+              By creating an account, you agree to RESEATO's Terms of Service and Privacy Policy
+            </p>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
