@@ -45,7 +45,7 @@ export const Button: React.FC<ButtonProps> = ({
       whileTap={{ scale: disabled || isLoading ? 1 : 0.98 }}
       className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${widthClass} ${className}`}
       disabled={disabled || isLoading}
-      {...props}
+      {...(props as any)}
     >
       {isLoading ? (
         <>

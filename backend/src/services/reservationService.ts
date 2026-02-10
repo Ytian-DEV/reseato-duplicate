@@ -261,6 +261,7 @@ export class ReservationService {
   private mapReservation(row: any): Reservation {
     return {
       id: row.id,
+      userId: row.customer_id,
       customerId: row.customer_id,
       restaurantId: row.restaurant_id,
       tableId: row.table_id,

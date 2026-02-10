@@ -10,8 +10,11 @@ import { AdminLayout } from './layouts/AdminLayout';
 
 // Pages
 import { HomePage } from './pages/customer/HomePage';
+import { RestaurantDetailPage } from './pages/customer/RestaurantDetailPage';
+import { MyReservationsPage } from './pages/customer/MyReservationsPage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterPage } from './pages/auth/RegisterPage';
+import { VendorDashboardPage } from './pages/vendor/DashboardPage';
 
 // Protected Route Component
 interface ProtectedRouteProps {
@@ -44,23 +47,12 @@ export const AppRouter: React.FC = () => {
         {/* Customer Routes */}
         <Route path="/" element={<CustomerLayout />}>
           <Route index element={<HomePage />} />
-          <Route
-            path="restaurant/:id"
-            element={
-              <div className="p-8 text-center">
-                <h1 className="text-2xl font-bold">Restaurant Detail Page</h1>
-                <p className="text-neutral-600 mt-2">Coming soon...</p>
-              </div>
-            }
-          />
+          <Route path="restaurant/:id" element={<RestaurantDetailPage />} />
           <Route
             path="my-reservations"
             element={
               <ProtectedRoute allowedRoles={[UserRole.CUSTOMER]}>
-                <div className="p-8 text-center">
-                  <h1 className="text-2xl font-bold">My Reservations</h1>
-                  <p className="text-neutral-600 mt-2">Coming soon...</p>
-                </div>
+                <MyReservationsPage />
               </ProtectedRoute>
             }
           />
@@ -75,15 +67,7 @@ export const AppRouter: React.FC = () => {
             </ProtectedRoute>
           }
         >
-          <Route
-            path="dashboard"
-            element={
-              <div className="p-8 text-center">
-                <h1 className="text-2xl font-bold">Vendor Dashboard</h1>
-                <p className="text-neutral-600 mt-2">Coming soon...</p>
-              </div>
-            }
-          />
+          <Route path="dashboard" element={<VendorDashboardPage />} />
           <Route
             path="reservations"
             element={

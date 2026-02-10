@@ -33,9 +33,9 @@ export const authenticateToken = (
     };
 
     req.user = decoded;
-    next();
+    return next();
   } catch (error) {
-    return res.status(403).json({
+    return res.status(401).json({
       success: false,
       error: 'Invalid or expired token'
     });
@@ -58,6 +58,6 @@ export const authorizeRoles = (...roles: UserRole[]) => {
       });
     }
 
-    next();
+    return next();
   };
 };

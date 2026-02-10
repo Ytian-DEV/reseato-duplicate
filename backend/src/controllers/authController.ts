@@ -31,7 +31,7 @@ class AuthController {
 
     const { user, token } = await authService.register(req.body);
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       data: {
         user,
@@ -52,7 +52,7 @@ class AuthController {
 
     const { user, token } = await authService.login(req.body);
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         user,
@@ -65,7 +65,7 @@ class AuthController {
   getProfile = asyncHandler(async (req: AuthRequest, res: Response) => {
     const user = await authService.getUserById(req.user!.id);
 
-    res.json({
+    return res.json({
       success: true,
       data: user
     });
@@ -73,7 +73,7 @@ class AuthController {
 
   logout = asyncHandler(async (req: AuthRequest, res: Response) => {
     // Since we're using JWT, logout is handled client-side by removing the token
-    res.json({
+    return res.json({
       success: true,
       message: 'Logged out successfully'
     });

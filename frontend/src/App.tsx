@@ -1,6 +1,5 @@
-import React from 'react';
 import { AppRouter } from './router';
-import './styles/globals.css';
+import './styles/global.css';
 
 function App() {
   return <AppRouter />;

@@ -29,7 +29,7 @@ class ReservationController {
       req.body
     );
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       data: reservation,
       message: 'Reservation created successfully'
@@ -39,7 +39,7 @@ class ReservationController {
   getMyReservations = asyncHandler(async (req: AuthRequest, res: Response) => {
     const reservations = await reservationService.getCustomerReservations(req.user!.id);
 
-    res.json({
+    return res.json({
       success: true,
       data: reservations
     });
@@ -51,7 +51,7 @@ class ReservationController {
       req.user!.id
     );
 
-    res.json({
+    return res.json({
       success: true,
       data: reservation,
       message: 'Reservation cancelled successfully'
@@ -75,7 +75,7 @@ class ReservationController {
       parseInt(guestCount as string)
     );
 
-    res.json({
+    return res.json({
       success: true,
       data: timeSlots
     });
@@ -91,7 +91,7 @@ class ReservationController {
       date as string
     );
 
-    res.json({
+    return res.json({
       success: true,
       data: reservations
     });
@@ -113,7 +113,7 @@ class ReservationController {
       req.user!.id // Pass vendor ID for authorization
     );
 
-    res.json({
+    return res.json({
       success: true,
       data: reservation,
       message: 'Reservation status updated successfully'

@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, MapPin, Utensils } from 'lucide-react';
-import { Restaurant, RestaurantFilters } from '../../../../shared/types';
+import { Search, Filter, Utensils } from 'lucide-react';
+import { Restaurant } from '../../../../shared/types';
 import restaurantService from '../../services/restaurantService';
 import { RestaurantCard } from '../../components/restaurant/RestaurantCard';
-import { Input } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
 
 const cuisineTypes = [
@@ -88,43 +87,51 @@ export const HomePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-neutral-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white">
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-br from-primary-600 via-primary-500 to-primary-400 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{ backgroundImage: 'var(--bg-pattern)' }}></div>
+      <div className="relative overflow-hidden h-[600px] flex items-center">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 z-0"
+          style={{ 
+            backgroundImage: 'var(--bg-pattern)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30 backdrop-blur-[2px]"></div>
         </div>
         
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="text-center"
           >
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
+            <h1 className="text-4xl md:text-7xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
               Discover Amazing
               <br />
-              <span className="text-primary-100">Restaurants in Cebu</span>
+              <span className="text-primary-300">Restaurants in Cebu</span>
             </h1>
-            <p className="text-xl text-primary-50 mb-8 max-w-2xl mx-auto">
+            <p className="text-xl md:text-2xl text-white/90 mb-10 max-w-2xl mx-auto drop-shadow-md font-light">
               Skip the wait. Reserve your table in seconds at the best restaurants around SM Seaside and beyond.
             </p>
 
             {/* Search Bar */}
             <div className="max-w-3xl mx-auto">
-              <div className="flex flex-col sm:flex-row gap-3 bg-white/95 backdrop-blur-sm rounded-2xl p-2 shadow-2xl">
+              <div className="flex flex-col sm:flex-row gap-3 bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl p-2 shadow-2xl">
                 <div className="flex-1 relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400" />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/70" />
                   <input
                     type="text"
                     placeholder="Search restaurants, cuisines..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 bg-transparent border-none focus:outline-none text-neutral-900 placeholder-neutral-400"
+                    className="w-full pl-12 pr-4 py-4 bg-transparent border-none focus:outline-none text-white placeholder-white/70"
                   />
                 </div>
-                <Button size="lg" className="sm:w-auto">
+                <Button size="lg" className="sm:w-auto bg-primary-500 hover:bg-primary-600 border-none shadow-lg">
                   <Search className="w-5 h-5 sm:mr-2" />
                   <span className="hidden sm:inline">Search</span>
                 </Button>
@@ -132,7 +139,7 @@ export const HomePage: React.FC = () => {
             </div>
 
             {/* Quick Stats */}
-            <div className="mt-12 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
+            <div className="mt-16 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
               {[
                 { number: restaurants.length, label: 'Restaurants' },
                 { number: '1000+', label: 'Happy Diners' },
@@ -143,21 +150,14 @@ export const HomePage: React.FC = () => {
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.5 + index * 0.1 }}
-                  className="text-white"
+                  className="text-white backdrop-blur-sm bg-white/10 rounded-xl p-4 border border-white/20"
                 >
-                  <div className="text-3xl md:text-4xl font-bold">{stat.number}</div>
-                  <div className="text-primary-100 text-sm md:text-base mt-1">{stat.label}</div>
+                  <div className="text-3xl md:text-4xl font-bold drop-shadow-sm">{stat.number}</div>
+                  <div className="text-white/80 text-sm md:text-base mt-1 font-medium">{stat.label}</div>
                 </motion.div>
               ))}
             </div>
           </motion.div>
-        </div>
-
-        {/* Wave Divider */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="w-full h-16 md:h-20">
-            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="white"></path>
-          </svg>
         </div>
       </div>
 

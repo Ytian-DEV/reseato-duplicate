@@ -5,8 +5,10 @@
 @tailwind utilities;
 
 :root {
-  --primary-gradient: linear-gradient(135deg, #f04438 0%, #dd2e23 100%);
-  --bg-pattern: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f5f5f5' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  --primary-gradient: linear-gradient(135deg, #f0770b 0%, #e15a07 100%);
+  --hero-gradient: linear-gradient(135deg, rgba(240, 119, 11, 0.95) 0%, rgba(225, 90, 7, 0.9) 100%);
+  --bg-pattern: url("https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80");
+  --accent-gradient: linear-gradient(135deg, #f8b437 0%, #f29016 100%);
 }
 
 * {
@@ -19,8 +21,8 @@ body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #fafafa;
-  color: #171717;
+  background: #fafaf9;
+  color: #1c1917;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -36,16 +38,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f5f5f5;
+  background: #f5f5f4;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d4d4d4;
+  background: #d6d3d1;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a3a3a3;
+  background: #a8a29e;
 }
 
 /* Smooth transitions */
@@ -58,15 +60,15 @@ button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 2px solid #f04438;
+  outline: 2px solid #f0770b;
   outline-offset: 2px;
 }
 
 /* Glass morphism effect */
 .glass {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(240, 119, 11, 0.1);
 }
 
 /* Gradient text */
@@ -105,10 +107,10 @@ select:focus-visible {
   animation: shimmer 2s infinite;
   background: linear-gradient(
     to right,
-    #f5f5f5 0%,
-    #e5e5e5 20%,
-    #f5f5f5 40%,
-    #f5f5f5 100%
+    #f5f5f4 0%,
+    #e7e5e4 20%,
+    #f5f5f4 40%,
+    #f5f5f4 100%
   );
   background-size: 1000px 100%;
 }
@@ -120,7 +122,7 @@ select:focus-visible {
 
 .card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(240, 119, 11, 0.1), 0 10px 10px -5px rgba(240, 119, 11, 0.05);
 }
 
 /* Button ripple effect */
@@ -137,7 +139,7 @@ select:focus-visible {
   width: 0;
   height: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.4);
   transform: translate(-50%, -50%);
   transition: width 0.6s, height 0.6s;
 }
@@ -179,9 +181,9 @@ select:focus-visible {
 .skeleton {
   background: linear-gradient(
     90deg,
-    #f5f5f5 25%,
-    #e5e5e5 50%,
-    #f5f5f5 75%
+    #f5f5f4 25%,
+    #e7e5e4 50%,
+    #f5f5f4 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
@@ -192,7 +194,7 @@ select:focus-visible {
   appearance: none;
   width: 20px;
   height: 20px;
-  border: 2px solid #d4d4d4;
+  border: 2px solid #d6d3d1;
   border-radius: 4px;
   cursor: pointer;
   position: relative;
@@ -201,7 +203,7 @@ select:focus-visible {
 
 .custom-checkbox:checked {
   background: var(--primary-gradient);
-  border-color: #f04438;
+  border-color: #f0770b;
 }
 
 .custom-checkbox:checked::after {
@@ -230,13 +232,13 @@ select:focus-visible {
 
 /* Status colors */
 .status-pending {
-  background: #fef3c7;
+  background: #fef0cd;
   color: #92400e;
 }
 
 .status-confirmed {
-  background: #d1fae5;
-  color: #065f46;
+  background: #dcfce7;
+  color: #166534;
 }
 
 .status-cancelled {
@@ -247,4 +249,26 @@ select:focus-visible {
 .status-completed {
   background: #e0e7ff;
   color: #3730a3;
+}
+
+/* Warm accent elements */
+.warm-glow {
+  box-shadow: 0 0 30px rgba(240, 119, 11, 0.15);
+}
+
+.warm-border {
+  border: 1px solid rgba(240, 119, 11, 0.2);
+}
+
+/* Soft elevation */
+.soft-elevation {
+  box-shadow: 
+    0 1px 3px 0 rgba(0, 0, 0, 0.05),
+    0 1px 2px 0 rgba(0, 0, 0, 0.03);
+}
+
+.soft-elevation-lg {
+  box-shadow: 
+    0 10px 15px -3px rgba(0, 0, 0, 0.05),
+    0 4px 6px -2px rgba(0, 0, 0, 0.03);
 }

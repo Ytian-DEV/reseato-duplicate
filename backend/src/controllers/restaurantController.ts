@@ -15,7 +15,7 @@ class RestaurantController {
 
     const restaurants = await restaurantService.getAllRestaurants(filters);
 
-    res.json({
+    return res.json({
       success: true,
       data: restaurants,
       count: restaurants.length
@@ -32,7 +32,7 @@ class RestaurantController {
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
       data: restaurant
     });
@@ -49,7 +49,7 @@ class RestaurantController {
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
       data: restaurant
     });
@@ -58,7 +58,7 @@ class RestaurantController {
   createRestaurant = asyncHandler(async (req: AuthRequest, res: Response) => {
     const restaurant = await restaurantService.createRestaurant(req.user!.id, req.body);
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       data: restaurant,
       message: 'Restaurant created successfully. Awaiting admin approval.'
@@ -72,7 +72,7 @@ class RestaurantController {
       req.body
     );
 
-    res.json({
+    return res.json({
       success: true,
       data: restaurant,
       message: 'Restaurant updated successfully'
@@ -82,7 +82,7 @@ class RestaurantController {
   getTables = asyncHandler(async (req: AuthRequest, res: Response) => {
     const tables = await restaurantService.getTables(req.params.id);
 
-    res.json({
+    return res.json({
       success: true,
       data: tables
     });
@@ -92,7 +92,7 @@ class RestaurantController {
     const { tableNumber, capacity } = req.body;
     const table = await restaurantService.addTable(req.params.id, tableNumber, capacity);
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       data: table,
       message: 'Table added successfully'
