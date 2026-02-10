@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { User, UserRole } from '../../../../shared/types';
 import authService from '../../services/authService';
 import { Button } from './Button';
+import { Menu, X, User as UserIcon, LogOut, UtensilsCrossed } from 'lucide-react';
 
 interface NavbarProps {
   user: User | null;
@@ -58,12 +59,12 @@ export const Navbar: React.FC<NavbarProps> = ({ user }) => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/30 group-hover:shadow-xl group-hover:shadow-primary-500/40 transition-all duration-300">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
+            <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/30 group-hover:shadow-primary-500/50 transition-all duration-300 group-hover:scale-105">
+              <UtensilsCrossed className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-bold gradient-text">RESEATO</span>
+            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-accent-600">
+              RESEATO
+            </span>
           </Link>
 
           {/* Desktop Navigation */}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User, Phone, ArrowRight, Store, Users } from 'lucide-react';
+import { Mail, Lock, User, Phone, ArrowRight, Store, Users, ArrowLeft, UtensilsCrossed } from 'lucide-react';
 import { Input } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
 import authService from '../../services/authService';
@@ -79,7 +79,10 @@ export const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50 flex items-center justify-center p-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50 flex items-center justify-center p-4 py-12 relative">
+      <Link to="/" className="absolute top-4 left-4 md:top-8 md:left-8 p-3 rounded-full bg-white/50 hover:bg-white backdrop-blur-sm shadow-sm hover:shadow-md text-neutral-600 hover:text-primary-600 transition-all duration-300 group">
+        <ArrowLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
+      </Link>
       <Toaster position="top-center" />
       
       <motion.div
@@ -92,12 +95,10 @@ export const RegisterPage: React.FC = () => {
           {/* Header */}
           <div className="text-center mb-8">
             <Link to="/" className="inline-flex items-center space-x-2 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/30">
-                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
+              <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/30">
+                <UtensilsCrossed className="w-7 h-7 text-white" />
               </div>
-              <span className="text-2xl font-bold gradient-text">RESEATO</span>
+              <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-accent-600">RESEATO</span>
             </Link>
             <h3 className="text-3xl font-bold text-neutral-900 mb-2">Create Account</h3>
             <p className="text-neutral-600">Join us and start reserving tables today</p>

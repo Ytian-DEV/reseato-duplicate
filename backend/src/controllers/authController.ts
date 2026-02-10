@@ -71,7 +71,7 @@ class AuthController {
     });
   });
 
-  logout = asyncHandler(async (req: AuthRequest, res: Response) => {
+  logout = asyncHandler(async (_req: AuthRequest, res: Response) => {
     // Since we're using JWT, logout is handled client-side by removing the token
     return res.json({
       success: true,

@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS tables (
     restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
     table_number VARCHAR(50) NOT NULL,
     capacity INTEGER NOT NULL,
+    is_available BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
