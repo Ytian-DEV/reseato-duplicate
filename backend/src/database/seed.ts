@@ -11,10 +11,10 @@ const seed = async () => {
     // Clear existing data
     await client.query('TRUNCATE TABLE payments, reservations, tables, restaurant_images, restaurants, users CASCADE');
 
-    // Create users
     const passwordHash = await bcrypt.hash('password123', 12);
 
-    const users = [
+    // 1. Create Admin and Customer Users
+    const baseUsers = [
       {
         email: 'admin@example.com',
         password: passwordHash,
@@ -22,14 +22,6 @@ const seed = async () => {
         lastName: 'User',
         role: UserRole.ADMIN,
         phone: '09123456789'
-      },
-      {
-        email: 'vendor@example.com',
-        password: passwordHash,
-        firstName: 'John',
-        lastName: 'Vendor',
-        role: UserRole.VENDOR,
-        phone: '09987654321'
       },
       {
         email: 'customer@example.com',
@@ -41,24 +33,23 @@ const seed = async () => {
       }
     ];
 
-    const createdUsers: any[] = [];
-
-    for (const user of users) {
-      const res = await client.query(
+    for (const user of baseUsers) {
+      await client.query(
         `INSERT INTO users (email, password_hash, first_name, last_name, role, phone)
-         VALUES ($1, $2, $3, $4, $5, $6)
-         RETURNING *`,
+         VALUES ($1, $2, $3, $4, $5, $6)`,
         [user.email, user.password, user.firstName, user.lastName, user.role, user.phone]
       );
-      createdUsers.push(res.rows[0]);
       console.log(`✅ Created user: ${user.email}`);
     }
 
-    const vendor = createdUsers.find(u => u.role === UserRole.VENDOR);
-
-    // Restaurants Data
+    // 2. Define Restaurants with their specific Owners
     const restaurantsData = [
       {
+        owner: {
+          email: 'vendor@example.com', // Original vendor
+          firstName: 'John',
+          lastName: 'Vendor',
+        },
         name: 'Seaside Delight',
         description: 'Experience the best seafood in Cebu with a view of the ocean.',
         cuisine: 'Seafood',
@@ -75,9 +66,14 @@ const seed = async () => {
         total_reviews: 120,
         latitude: 10.2829,
         longitude: 123.8854,
-        image: '/assets/images/seaside-delight.jpg' // Placeholder as user didn't provide this image
+        image: '/assets/images/seaside-delight.jpg'
       },
       {
+        owner: {
+          email: 'bigbys@reseato.com',
+          firstName: 'Bigbys',
+          lastName: 'Manager',
+        },
         name: "Bigby's",
         description: 'Fun dining atmosphere with large servings perfect for sharing.',
         cuisine: 'International',
@@ -97,6 +93,11 @@ const seed = async () => {
         image: "/assets/images/bigby's.jpg"
       },
       {
+        owner: {
+          email: 'chilis@reseato.com',
+          firstName: 'Chilis',
+          lastName: 'Manager',
+        },
         name: "Chili's",
         description: 'Family-friendly chain serving classic Tex-Mex & American fare.',
         cuisine: 'Tex-Mex',
@@ -116,6 +117,11 @@ const seed = async () => {
         image: "/assets/images/chill's.jpg"
       },
       {
+        owner: {
+          email: 'cabalen@reseato.com',
+          firstName: 'Cabalen',
+          lastName: 'Manager',
+        },
         name: 'Cabalen',
         description: 'All-you-can-eat Filipino buffet featuring Kapampangan specialties.',
         cuisine: 'Filipino',
@@ -135,6 +141,11 @@ const seed = async () => {
         image: '/assets/images/cabalen.avif'
       },
       {
+        owner: {
+          email: 'brique@reseato.com',
+          firstName: 'Brique',
+          lastName: 'Manager',
+        },
         name: 'Brique',
         description: 'Modern dining with a rustic vibe offering comfort food and wine.',
         cuisine: 'Modern European',
@@ -156,7 +167,17 @@ const seed = async () => {
     ];
 
     for (const rData of restaurantsData) {
-      // Create Restaurant
+      // 3. Create Vendor User for this Restaurant
+      const userRes = await client.query(
+        `INSERT INTO users (email, password_hash, first_name, last_name, role, phone)
+         VALUES ($1, $2, $3, $4, $5, $6)
+         RETURNING id`,
+        [rData.owner.email, passwordHash, rData.owner.firstName, rData.owner.lastName, UserRole.VENDOR, '09000000000']
+      );
+      const ownerId = userRes.rows[0].id;
+      console.log(`✅ Created vendor: ${rData.owner.email}`);
+
+      // 4. Create Restaurant linked to this Owner
       const restaurantRes = await client.query(
         `INSERT INTO restaurants (
           owner_id, name, description, cuisine, cuisine_type, address, city, zip_code, 
@@ -165,7 +186,7 @@ const seed = async () => {
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
         RETURNING *`,
         [
-          vendor.id,
+          ownerId,
           rData.name,
           rData.description,
           rData.cuisine,
@@ -195,21 +216,21 @@ const seed = async () => {
         [restaurant.id, rData.image, true]
       );
 
-      // Add Tables (Standard set for all)
+      // Add Tables
       const tables = [
-        { number: 'T1', capacity: 2 },
-        { number: 'T2', capacity: 2 },
-        { number: 'T3', capacity: 4 },
-        { number: 'T4', capacity: 4 },
-        { number: 'T5', capacity: 6 },
-        { number: 'T6', capacity: 8 },
+        { number: 'T1', capacity: 2, is_available: true },
+        { number: 'T2', capacity: 2, is_available: true },
+        { number: 'T3', capacity: 4, is_available: true },
+        { number: 'T4', capacity: 4, is_available: true },
+        { number: 'T5', capacity: 6, is_available: true },
+        { number: 'T6', capacity: 8, is_available: true },
       ];
 
       for (const table of tables) {
         await client.query(
-          `INSERT INTO tables (restaurant_id, table_number, capacity)
-           VALUES ($1, $2, $3)`,
-          [restaurant.id, table.number, table.capacity]
+          `INSERT INTO tables (restaurant_id, table_number, capacity, is_available)
+           VALUES ($1, $2, $3, $4)`,
+          [restaurant.id, table.number, table.capacity, table.is_available]
         );
       }
     }

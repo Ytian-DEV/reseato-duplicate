@@ -106,7 +106,7 @@ export const RestaurantDetailPage: React.FC = () => {
       <Toaster position="top-center" />
 
       {/* Hero Image */}
-      <div className="relative h-96 overflow-hidden">
+      <div className="relative h-64 md:h-96 overflow-hidden">
         <img
           src={primaryImage}
           alt={restaurant.name}
@@ -117,30 +117,30 @@ export const RestaurantDetailPage: React.FC = () => {
         {/* Back Button */}
         <button
           onClick={() => navigate('/')}
-          className="absolute top-8 left-8 bg-white/90 backdrop-blur-sm p-3 rounded-full hover:bg-white transition-all duration-200 shadow-lg"
+          className="absolute top-4 left-4 md:top-8 md:left-8 bg-white/90 backdrop-blur-sm p-2 md:p-3 rounded-full hover:bg-white transition-all duration-200 shadow-lg"
         >
-          <ArrowLeft className="w-6 h-6 text-neutral-900" />
+          <ArrowLeft className="w-5 h-5 md:w-6 md:h-6 text-neutral-900" />
         </button>
 
         {/* Title Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-8">
+        <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8">
           <div className="max-w-6xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="space-y-4"
+              className="space-y-2 md:space-y-4"
             >
-              <div className="inline-block bg-primary-500 text-white px-4 py-2 rounded-full text-sm font-semibold uppercase tracking-wide">
+              <div className="inline-block bg-primary-500 text-white px-3 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-semibold uppercase tracking-wide">
                 {restaurant.cuisineType}
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold text-white">
+              <h1 className="text-3xl md:text-5xl font-bold text-white leading-tight">
                 {restaurant.name}
               </h1>
-              <div className="flex items-center space-x-6 text-white">
-                <div className="flex items-center space-x-2">
-                  <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                  <span className="text-lg font-semibold">{restaurant.rating.toFixed(1)}</span>
-                  <span className="text-neutral-300">({restaurant.totalReviews} reviews)</span>
+              <div className="flex items-center space-x-4 md:space-x-6 text-white">
+                <div className="flex items-center space-x-1 md:space-x-2">
+                  <Star className="w-4 h-4 md:w-5 md:h-5 fill-yellow-400 text-yellow-400" />
+                  <span className="text-base md:text-lg font-semibold">{restaurant.rating.toFixed(1)}</span>
+                  <span className="text-xs md:text-base text-neutral-300">({restaurant.totalReviews} reviews)</span>
                 </div>
               </div>
             </motion.div>

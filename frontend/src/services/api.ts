@@ -27,7 +27,11 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    // Check if the error is from an auth endpoint to avoid infinite loops
+    const isAuthRequest = error.config?.url?.includes('/auth/login') || 
+                         error.config?.url?.includes('/auth/register');
+
+    if (error.response?.status === 401 && !isAuthRequest) {
       // Token expired or invalid
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -41,6 +45,11 @@ export default api;
 
 // Helper function to handle API errors
 export const handleApiError = (error: any): string => {
+  // Handle express-validator errors array
+  if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+    return error.response.data.errors.map((e: any) => e.msg).join(', ');
+  }
+
   if (error.response?.data?.error) {
     return error.response.data.error;
   }

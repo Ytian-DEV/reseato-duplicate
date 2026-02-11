@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, User, Phone, ArrowRight, Store, Users, ArrowLeft, UtensilsCrossed } from 'lucide-react';
@@ -21,6 +21,20 @@ export const RegisterPage: React.FC = () => {
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<any>({});
+
+  // Check if user is already logged in
+  useEffect(() => {
+    if (authService.isAuthenticated()) {
+      const user = authService.getStoredUser();
+      if (user?.role === 'vendor') {
+        navigate('/vendor/dashboard');
+      } else if (user?.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/');
+      }
+    }
+  }, []);
 
   const handleChange = (field: string, value: string) => {
     setFormData({ ...formData, [field]: value });
@@ -148,7 +162,7 @@ export const RegisterPage: React.FC = () => {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
                 label="First Name"
                 type="text"

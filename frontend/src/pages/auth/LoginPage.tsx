@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, ArrowRight, ArrowLeft, UtensilsCrossed } from 'lucide-react';
@@ -13,6 +13,24 @@ export const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({ email: '', password: '' });
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const user = authService.getStoredUser();
+    if (user && authService.isAuthenticated()) {
+      redirectUser(user);
+    }
+  }, []);
+
+  const redirectUser = (user: any) => {
+    if (user?.role === 'vendor') {
+      navigate('/vendor/dashboard');
+    } else if (user?.role === 'admin') {
+      navigate('/admin/dashboard');
+    } else {
+      navigate('/');
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,15 +51,9 @@ export const LoginPage: React.FC = () => {
       toast.success('Login successful!');
       
       const user = authService.getStoredUser();
-      // Redirect based on role
-      if (user?.role === 'vendor') {
-        navigate('/vendor/dashboard');
-      } else if (user?.role === 'admin') {
-        navigate('/admin/dashboard');
-      } else {
-        navigate('/');
-      }
+      redirectUser(user);
     } catch (error: any) {
+      console.error('Login error:', error);
       toast.error(error.message || 'Login failed');
     } finally {
       setLoading(false);
@@ -113,10 +125,10 @@ export const LoginPage: React.FC = () => {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
-            <div className="mb-8">
-              <h3 className="text-3xl font-bold text-neutral-900 mb-2">Sign In</h3>
-              <p className="text-neutral-600">Enter your credentials to continue</p>
+          <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-12">
+            <div className="mb-6 md:mb-8">
+              <h3 className="text-2xl md:text-3xl font-bold text-neutral-900 mb-2">Sign In</h3>
+              <p className="text-sm md:text-base text-neutral-600">Enter your credentials to continue</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">

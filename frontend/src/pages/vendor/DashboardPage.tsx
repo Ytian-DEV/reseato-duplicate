@@ -123,7 +123,7 @@ export const VendorDashboardPage: React.FC = () => {
 
         {/* Date Selector */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center space-x-2">
               <Calendar className="w-5 h-5 text-primary-500" />
               <span className="font-semibold text-neutral-700">Select Date</span>
@@ -132,7 +132,7 @@ export const VendorDashboardPage: React.FC = () => {
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="px-4 py-2 bg-neutral-50 border-2 border-neutral-200 rounded-lg focus:border-primary-500 focus:outline-none transition-all duration-200"
+              className="w-full sm:w-auto px-4 py-2 bg-neutral-50 border-2 border-neutral-200 rounded-lg focus:border-primary-500 focus:outline-none transition-all duration-200"
             />
           </div>
         </div>
