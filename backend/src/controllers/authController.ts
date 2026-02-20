@@ -71,6 +71,16 @@ class AuthController {
     });
   });
 
+  updateProfile = asyncHandler(async (req: AuthRequest, res: Response) => {
+    const user = await authService.updateProfile(req.user!.id, req.body);
+
+    return res.json({
+      success: true,
+      data: user,
+      message: 'Profile updated successfully'
+    });
+  });
+
   logout = asyncHandler(async (_req: AuthRequest, res: Response) => {
     // Since we're using JWT, logout is handled client-side by removing the token
     return res.json({

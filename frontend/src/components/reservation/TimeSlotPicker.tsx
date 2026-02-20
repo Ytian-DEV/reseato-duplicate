@@ -69,50 +69,75 @@ export const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({
     );
   }
 
+  const getTimeOfDay = (time: string) => {
+    const hour = parseInt(time.split(':')[0]);
+    if (hour < 12) return 'Morning';
+    if (hour < 17) return 'Afternoon';
+    return 'Evening';
+  };
+
+  const groupedSlots = timeSlots.reduce((acc, slot) => {
+    const period = getTimeOfDay(slot.time);
+    if (!acc[period]) acc[period] = [];
+    acc[period].push(slot);
+    return acc;
+  }, {} as Record<string, TimeSlot[]>);
+
+  const periods = ['Morning', 'Afternoon', 'Evening'];
+
   return (
-    <div className="space-y-3">
-      <div className="flex items-center space-x-2 text-neutral-700 mb-4">
+    <div className="space-y-4">
+      <div className="flex items-center space-x-2 text-neutral-700 mb-2">
         <Clock className="w-5 h-5 text-primary-500" />
         <span className="font-semibold">Select Time</span>
       </div>
 
-      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-        {timeSlots.map((slot) => {
-          const isSelected = selectedTime === slot.time;
-          const isAvailable = slot.available;
+      <div className="max-h-[300px] overflow-y-auto pr-2 space-y-6 custom-scrollbar">
+        {periods.map((period) => {
+          const slots = groupedSlots[period];
+          if (!slots || slots.length === 0) return null;
 
           return (
-            <motion.button
-              key={slot.time}
-              whileHover={isAvailable ? { scale: 1.05 } : {}}
-              whileTap={isAvailable ? { scale: 0.95 } : {}}
-              onClick={() => isAvailable && onTimeSelect(slot.time)}
-              disabled={!isAvailable}
-              className={`
-                relative px-4 py-3 rounded-lg font-medium text-sm transition-all duration-200
-                ${isSelected
-                  ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/30'
-                  : isAvailable
-                    ? 'bg-white border-2 border-neutral-200 text-neutral-700 hover:border-primary-300 hover:bg-primary-50'
-                    : 'bg-neutral-100 text-neutral-400 cursor-not-allowed opacity-60'
-                }
-              `}
-            >
-              {isSelected && (
-                <CheckCircle className="w-4 h-4 absolute top-1 right-1" />
-              )}
-              <div>{slot.time}</div>
-              {isAvailable && slot.tablesAvailable > 0 && (
-                <div className="text-xs mt-1 opacity-75">
-                  {slot.tablesAvailable} table{slot.tablesAvailable !== 1 ? 's' : ''}
-                </div>
-              )}
-            </motion.button>
+            <div key={period}>
+              <h4 className="text-sm font-semibold text-neutral-500 mb-3 uppercase tracking-wider sticky top-0 bg-white py-1 z-10">
+                {period}
+              </h4>
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                {slots.map((slot) => {
+                  const isSelected = selectedTime === slot.time;
+                  const isAvailable = slot.available;
+
+                  return (
+                    <motion.button
+                      key={slot.time}
+                      whileHover={isAvailable ? { scale: 1.02 } : {}}
+                      whileTap={isAvailable ? { scale: 0.98 } : {}}
+                      onClick={() => isAvailable && onTimeSelect(slot.time)}
+                      disabled={!isAvailable}
+                      className={`
+                        relative px-2 py-2 rounded-lg font-medium text-sm transition-all duration-200
+                        ${isSelected
+                          ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-md shadow-primary-500/30'
+                          : isAvailable
+                            ? 'bg-white border border-neutral-200 text-neutral-700 hover:border-primary-300 hover:bg-primary-50'
+                            : 'bg-neutral-50 text-neutral-400 cursor-not-allowed opacity-50'
+                        }
+                      `}
+                    >
+                      {isSelected && (
+                        <CheckCircle className="w-3 h-3 absolute top-1 right-1" />
+                      )}
+                      <div>{slot.time}</div>
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </div>
           );
         })}
       </div>
 
-      <p className="text-xs text-neutral-500 mt-4">
+      <p className="text-xs text-neutral-500 mt-2">
         * Times shown are in 30-minute intervals
       </p>
     </div>

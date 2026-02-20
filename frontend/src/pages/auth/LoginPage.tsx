@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, ArrowRight, ArrowLeft, UtensilsCrossed } from 'lucide-react';
+import { Mail, Lock, ArrowRight, ArrowLeft, UtensilsCrossed, Eye, EyeOff } from 'lucide-react';
 import { Input } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
 import authService from '../../services/authService';
@@ -11,6 +11,7 @@ export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({ email: '', password: '' });
 
@@ -58,6 +59,10 @@ export const LoginPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleForgotPassword = () => {
+    toast.error('Forgot password functionality coming soon!');
   };
 
   return (
@@ -146,7 +151,7 @@ export const LoginPage: React.FC = () => {
 
               <Input
                 label="Password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
@@ -154,6 +159,19 @@ export const LoginPage: React.FC = () => {
                 }}
                 error={errors.password}
                 leftIcon={<Lock className="w-5 h-5" />}
+                rightIcon={
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="focus:outline-none hover:text-primary-600 transition-colors"
+                  >
+                    {showPassword ? (
+                      <Eye className="w-5 h-5" />
+                    ) : (
+                      <EyeOff className="w-5 h-5" />
+                    )}
+                  </button>
+                }
               />
 
               <div className="flex items-center justify-between">
@@ -161,9 +179,13 @@ export const LoginPage: React.FC = () => {
                   <input type="checkbox" className="custom-checkbox" />
                   <span className="text-sm text-neutral-600">Remember me</span>
                 </label>
-                <Link to="/forgot-password" className="text-sm text-primary-600 hover:text-primary-700 font-medium">
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  className="text-sm text-primary-600 hover:text-primary-700 font-medium focus:outline-none"
+                >
                   Forgot password?
-                </Link>
+                </button>
               </div>
 
               <Button

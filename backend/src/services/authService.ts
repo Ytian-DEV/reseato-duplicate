@@ -91,6 +91,27 @@ export class AuthService {
     return this.mapUser(result.rows[0]);
   }
 
+  async updateProfile(userId: string, data: Partial<User>): Promise<User> {
+    const { firstName, lastName, phone } = data;
+    
+    const result = await pool.query(
+      `UPDATE users 
+       SET first_name = COALESCE($1, first_name),
+           last_name = COALESCE($2, last_name),
+           phone = COALESCE($3, phone),
+           updated_at = NOW()
+       WHERE id = $4
+       RETURNING id, email, first_name, last_name, phone, role, created_at, updated_at`,
+      [firstName, lastName, phone, userId]
+    );
+
+    if (result.rows.length === 0) {
+      throw new AppError('User not found', 404);
+    }
+
+    return this.mapUser(result.rows[0]);
+  }
+
   private generateToken(user: User): string {
     return jwt.sign(
       {

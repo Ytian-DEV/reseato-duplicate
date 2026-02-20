@@ -59,7 +59,7 @@ export const RestaurantDetailPage: React.FC = () => {
 
     try {
       setSubmitting(true);
-      await reservationService.createReservation({
+      const reservation = await reservationService.createReservation({
         restaurantId: id!,
         reservationDate,
         reservationTime: selectedTime,
@@ -67,8 +67,8 @@ export const RestaurantDetailPage: React.FC = () => {
         specialNotes,
       });
 
-      toast.success('Reservation created successfully!');
-      navigate('/my-reservations');
+      toast.success('Reservation initiated! Proceed to payment.');
+      navigate(`/payment/${reservation.id}`);
     } catch (error: any) {
       toast.error(error.message || 'Failed to create reservation');
     } finally {
@@ -284,7 +284,7 @@ export const RestaurantDetailPage: React.FC = () => {
                 </Button>
 
                 <p className="text-xs text-center text-neutral-500">
-                  You will be charged ₱30 as reservation fee
+                  You will be charged ₱100 as reservation fee
                 </p>
               </div>
             </Card>

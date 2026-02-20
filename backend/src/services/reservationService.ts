@@ -7,6 +7,7 @@ import {
 } from '../../../shared/types';
 import { AppError } from '../middleware/errorHandler';
 import { format, parse, addMinutes } from 'date-fns';
+import notificationService from './notificationService';
 
 export class ReservationService {
   async createReservation(
@@ -55,6 +56,13 @@ export class ReservationService {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *`,
       [customerId, restaurantId, availableTable.id, reservationDate, reservationTime, guestCount, specialNotes, ReservationStatus.PENDING]
+    );
+
+    // Notify Customer (Payment Pending)
+    await notificationService.createNotification(
+      customerId,
+      'Reservation Initiated',
+      'Please complete your payment to confirm the reservation.'
     );
 
     return this.mapReservation(result.rows[0]);
@@ -129,11 +137,14 @@ export class ReservationService {
     let query = `
       SELECT r.*, 
              u.first_name, u.last_name, u.email, u.phone,
-             t.table_number, t.capacity
+             t.table_number, t.capacity,
+             p.payment_status
       FROM reservations r
       JOIN users u ON r.customer_id = u.id
       LEFT JOIN tables t ON r.table_id = t.id
+      JOIN payments p ON r.id = p.reservation_id
       WHERE r.restaurant_id = $1
+      AND p.payment_status = 'completed'
     `;
     
     const params: any[] = [restaurantId];
@@ -177,7 +188,20 @@ export class ReservationService {
       throw new AppError('Reservation not found', 404);
     }
 
-    return this.mapReservation(result.rows[0]);
+    const reservation = result.rows[0];
+
+    // Notify Customer about status change
+    const statusMsg = status === ReservationStatus.CONFIRMED 
+      ? 'Your reservation has been confirmed!' 
+      : `Your reservation status has been updated to ${status}.`;
+    
+    await notificationService.createNotification(
+      reservation.customer_id,
+      'Reservation Update',
+      statusMsg
+    );
+
+    return this.mapReservation(reservation);
   }
 
   async cancelReservation(reservationId: string, userId: string): Promise<Reservation> {

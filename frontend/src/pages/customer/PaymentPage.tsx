@@ -1,0 +1,158 @@
+import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { CreditCard, Lock, CheckCircle, Wallet } from 'lucide-react';
+import { Button } from '../../components/common/Button';
+import { Card } from '../../components/common/Card';
+import paymentService from '../../services/paymentService';
+import toast, { Toaster } from 'react-hot-toast';
+
+export const PaymentPage: React.FC = () => {
+  const { reservationId } = useParams<{ reservationId: string }>();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('card');
+
+  const handlePayment = async () => {
+    if (!reservationId) return;
+
+    try {
+      setLoading(true);
+      await paymentService.createPayment(reservationId, 100, paymentMethod);
+      
+      toast.success('Payment successful!');
+      
+      // Delay navigation to show success message
+      setTimeout(() => {
+        navigate('/my-reservations');
+      }, 1500);
+    } catch (error: any) {
+      toast.error(error.message || 'Payment failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-neutral-50 py-12 px-4 sm:px-6 lg:px-8">
+      <Toaster position="top-center" />
+      
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-md mx-auto"
+      >
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-neutral-900">Secure Payment</h1>
+          <p className="text-neutral-600 mt-2">Complete your reservation</p>
+        </div>
+
+        <Card className="shadow-2xl overflow-hidden">
+          <div className="bg-primary-50 -mx-6 -mt-6 px-6 py-4 border-b border-primary-100 mb-6">
+            <div className="flex justify-between items-center">
+              <span className="text-primary-800 font-medium">Reservation Fee</span>
+              <span className="text-2xl font-bold text-primary-600">₱100.00</span>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-3">
+                Select Payment Method
+              </label>
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  onClick={() => setPaymentMethod('card')}
+                  className={`
+                    p-4 rounded-xl border-2 flex flex-col items-center justify-center space-y-2 transition-all
+                    ${paymentMethod === 'card'
+                      ? 'border-primary-500 bg-primary-50 text-primary-700'
+                      : 'border-neutral-200 hover:border-neutral-300 text-neutral-600'
+                    }
+                  `}
+                >
+                  <CreditCard className="w-6 h-6" />
+                  <span className="text-sm font-medium">Credit Card</span>
+                </button>
+                <button
+                  onClick={() => setPaymentMethod('wallet')}
+                  className={`
+                    p-4 rounded-xl border-2 flex flex-col items-center justify-center space-y-2 transition-all
+                    ${paymentMethod === 'wallet'
+                      ? 'border-primary-500 bg-primary-50 text-primary-700'
+                      : 'border-neutral-200 hover:border-neutral-300 text-neutral-600'
+                    }
+                  `}
+                >
+                  <Wallet className="w-6 h-6" />
+                  <span className="text-sm font-medium">GCash / Maya / InstaPay</span>
+                </button>
+              </div>
+            </div>
+
+            {paymentMethod === 'card' && (
+              <div className="space-y-4 animate-fade-in">
+                <div>
+                  <label className="block text-xs font-medium text-neutral-500 mb-1 uppercase tracking-wide">Card Number</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="0000 0000 0000 0000"
+                      className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                    <CreditCard className="w-5 h-5 text-neutral-400 absolute left-3 top-3.5" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-neutral-500 mb-1 uppercase tracking-wide">Expiry</label>
+                    <input
+                      type="text"
+                      placeholder="MM / YY"
+                      className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-neutral-500 mb-1 uppercase tracking-wide">CVC</label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="123"
+                        className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      />
+                      <Lock className="w-4 h-4 text-neutral-400 absolute left-3 top-3.5" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {paymentMethod === 'wallet' && (
+              <div className="bg-neutral-50 p-4 rounded-lg text-center animate-fade-in">
+                <p className="text-neutral-600 text-sm">
+                  You will be redirected to the secure payment gateway to complete your transaction.
+                </p>
+              </div>
+            )}
+
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
+              onClick={handlePayment}
+              isLoading={loading}
+              leftIcon={<Lock className="w-4 h-4" />}
+            >
+              Pay ₱100.00
+            </Button>
+
+            <div className="flex items-center justify-center space-x-2 text-xs text-neutral-500">
+              <CheckCircle className="w-3 h-3 text-green-500" />
+              <span>Secure encrypted transaction</span>
+            </div>
+          </div>
+        </Card>
+      </motion.div>
+    </div>
+  );
+};

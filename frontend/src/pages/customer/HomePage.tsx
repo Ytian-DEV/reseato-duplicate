@@ -186,7 +186,7 @@ export const HomePage: React.FC = () => {
       </div>
 
       {/* Filters Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 z-30">
         <div className="bg-white rounded-2xl shadow-xl p-4 md:p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2 text-neutral-700">

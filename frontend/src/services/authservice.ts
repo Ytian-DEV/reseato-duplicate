@@ -54,6 +54,20 @@ class AuthService {
     }
   }
 
+  async updateProfile(data: Partial<User>): Promise<User> {
+    try {
+      const response = await api.put('/auth/profile', data);
+      const user = response.data.data;
+      
+      // Update stored user
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      return user;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('user');

@@ -30,7 +30,7 @@ export const Input: React.FC<InputProps> = ({
         <input
           className={`
             peer w-full px-4 py-3 pt-6
-            ${leftIcon ? 'pl-12' : ''}
+            ${leftIcon ? 'pl-14' : ''}
             ${rightIcon ? 'pr-12' : ''}
             bg-white border-2 border-neutral-200
             rounded-xl text-neutral-900
@@ -48,8 +48,8 @@ export const Input: React.FC<InputProps> = ({
         
         <label
           className={`
-            absolute left-4 transition-all duration-200 pointer-events-none
-            ${leftIcon ? 'left-12' : 'left-4'}
+            absolute transition-all duration-200 pointer-events-none
+            ${leftIcon ? 'left-14' : 'left-4'}
             ${isFocused || hasValue
               ? 'top-2 text-xs text-primary-600 font-medium'
               : 'top-1/2 -translate-y-1/2 text-base text-neutral-400'

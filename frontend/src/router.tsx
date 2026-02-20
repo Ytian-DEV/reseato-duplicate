@@ -15,6 +15,9 @@ import { MyReservationsPage } from './pages/customer/MyReservationsPage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterPage } from './pages/auth/RegisterPage';
 import { VendorDashboardPage } from './pages/vendor/DashboardPage';
+import { AdminDashboard } from './pages/admin/AdminDashboard';
+import { PaymentPage } from './pages/customer/PaymentPage';
+import { ProfilePage } from './pages/customer/ProfilePage';
 
 // Protected Route Component
 interface ProtectedRouteProps {
@@ -53,6 +56,22 @@ export const AppRouter: React.FC = () => {
             element={
               <ProtectedRoute allowedRoles={[UserRole.CUSTOMER]}>
                 <MyReservationsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="payment/:reservationId"
+            element={
+              <ProtectedRoute allowedRoles={[UserRole.CUSTOMER]}>
+                <PaymentPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
               </ProtectedRoute>
             }
           />
@@ -99,12 +118,7 @@ export const AppRouter: React.FC = () => {
         >
           <Route
             path="dashboard"
-            element={
-              <div className="p-8 text-center">
-                <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-                <p className="text-neutral-600 mt-2">Coming soon...</p>
-              </div>
-            }
+            element={<AdminDashboard />}
           />
           <Route
             path="restaurants"

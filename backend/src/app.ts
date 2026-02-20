@@ -4,6 +4,9 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes';
 import restaurantRoutes from './routes/restaurantRoutes';
 import reservationRoutes from './routes/reservationRoutes';
+import adminRoutes from './routes/adminRoutes';
+import paymentRoutes from './routes/paymentRoutes';
+import notificationRoutes from './routes/notificationRoutes';
 import { errorHandler } from './middleware/errorHandler';
 
 dotenv.config();
@@ -28,6 +31,9 @@ app.get('/health', (_req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/reservations', reservationRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Error handling middleware (must be last)
 app.use(errorHandler);

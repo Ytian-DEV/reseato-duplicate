@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, UserRole } from '../../../../shared/types';
 import authService from '../../services/authService';
+import notificationService, { Notification } from '../../services/notificationService';
 import { Button } from './Button';
-import { Menu, X, User as UserIcon, LogOut, UtensilsCrossed } from 'lucide-react';
+import { UtensilsCrossed, Bell } from 'lucide-react';
 
 interface NavbarProps {
   user: User | null;
@@ -13,8 +14,52 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ user }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    if (user) {
+      loadNotifications();
+      // Poll for notifications every 30 seconds
+      const interval = setInterval(loadNotifications, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [user]);
+
+  const loadNotifications = async () => {
+    try {
+      const data = await notificationService.getNotifications();
+      setNotifications(data);
+      setUnreadCount(data.filter(n => !n.isRead).length);
+    } catch (error) {
+      console.error('Failed to load notifications', error);
+    }
+  };
+
+  const handleMarkAsRead = async (id: string) => {
+    try {
+      await notificationService.markAsRead(id);
+      setNotifications(notifications.map(n => 
+        n.id === id ? { ...n, isRead: true } : n
+      ));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (error) {
+      console.error('Failed to mark as read', error);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      await notificationService.markAllAsRead();
+      setNotifications(notifications.map(n => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+    } catch (error) {
+      console.error('Failed to mark all as read', error);
+    }
+  };
 
   const handleLogout = () => {
     authService.logout();
@@ -89,9 +134,75 @@ export const Navbar: React.FC<NavbarProps> = ({ user }) => {
           {/* User Menu */}
           <div className="flex items-center space-x-4">
             {user ? (
-              <div className="relative">
-                <button
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+              <div className="flex items-center space-x-2">
+                {/* Notifications */}
+                <div className="relative">
+                  <button
+                    onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                    className="p-2 rounded-full hover:bg-neutral-100 transition-colors relative"
+                  >
+                    <Bell className="w-6 h-6 text-neutral-600" />
+                    {unreadCount > 0 && (
+                      <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </button>
+
+                  <AnimatePresence>
+                    {isNotificationsOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-neutral-200 overflow-hidden z-50"
+                      >
+                        <div className="p-4 border-b border-neutral-100 flex justify-between items-center">
+                          <h3 className="font-semibold text-neutral-900">Notifications</h3>
+                          {unreadCount > 0 && (
+                            <button
+                              onClick={handleMarkAllAsRead}
+                              className="text-xs text-primary-600 hover:text-primary-700 font-medium"
+                            >
+                              Mark all read
+                            </button>
+                          )}
+                        </div>
+                        <div className="max-h-96 overflow-y-auto">
+                          {notifications.length === 0 ? (
+                            <div className="p-4 text-center text-neutral-500 text-sm">
+                              No notifications yet
+                            </div>
+                          ) : (
+                            notifications.map((notification) => (
+                              <div
+                                key={notification.id}
+                                className={`p-4 border-b border-neutral-50 hover:bg-neutral-50 transition-colors ${
+                                  !notification.isRead ? 'bg-primary-50/30' : ''
+                                }`}
+                                onClick={() => !notification.isRead && handleMarkAsRead(notification.id)}
+                              >
+                                <div className="flex justify-between items-start mb-1">
+                                  <h4 className={`text-sm font-medium ${!notification.isRead ? 'text-primary-700' : 'text-neutral-900'}`}>
+                                    {notification.title}
+                                  </h4>
+                                  <span className="text-xs text-neutral-400">
+                                    {new Date(notification.createdAt).toLocaleDateString()}
+                                  </span>
+                                </div>
+                                <p className="text-sm text-neutral-600">{notification.message}</p>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                <div className="relative">
+                  <button
+                    onClick={() => setIsProfileOpen(!isProfileOpen)}
                   className="flex items-center space-x-3 px-4 py-2 rounded-lg hover:bg-neutral-100 transition-colors duration-200"
                 >
                   <div className="w-10 h-10 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white font-semibold shadow-lg">
@@ -144,6 +255,7 @@ export const Navbar: React.FC<NavbarProps> = ({ user }) => {
                     </motion.div>
                   )}
                 </AnimatePresence>
+              </div>
               </div>
             ) : (
               <div className="flex items-center space-x-3">

@@ -10,6 +10,7 @@ router.post('/login', loginValidation, authController.login);
 
 // Protected routes
 router.get('/profile', authenticateToken, authController.getProfile);
+router.put('/profile', authenticateToken, authController.updateProfile);
 router.post('/logout', authenticateToken, authController.logout);
 
 export default router;
