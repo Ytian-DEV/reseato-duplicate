@@ -74,14 +74,10 @@ export const Navbar: React.FC<NavbarProps> = ({ user }) => {
 
   const vendorLinks = [
     { name: 'Dashboard', path: '/vendor/dashboard' },
-    { name: 'Reservations', path: '/vendor/reservations' },
-    { name: 'Settings', path: '/vendor/settings' },
   ];
 
   const adminLinks = [
     { name: 'Dashboard', path: '/admin/dashboard' },
-    { name: 'Restaurants', path: '/admin/restaurants' },
-    { name: 'Users', path: '/admin/users' },
   ];
 
   const getLinks = () => {

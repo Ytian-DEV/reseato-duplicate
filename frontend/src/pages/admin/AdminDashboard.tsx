@@ -68,7 +68,8 @@ export const AdminDashboard: React.FC = () => {
       const data = await adminService.getAllUsers();
       setUsers(data);
     } catch (error) {
-      toast.error('Failed to load users');
+      console.error('Failed to load users:', error);
+      // Removed toast error to prevent spamming if it fails silently
     }
   };
 

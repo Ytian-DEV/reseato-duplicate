@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, CheckCircle, XCircle, Users, TrendingUp } from 'lucide-react';
+import { Calendar, Clock, CheckCircle, XCircle, Users, TrendingUp, PieChart } from 'lucide-react';
 import { Reservation, ReservationStatus } from '../../../../shared/types';
 import restaurantService from '../../services/restaurantService';
 import reservationService from '../../services/reservationService';
@@ -9,6 +9,7 @@ import { Button } from '../../components/common/Button';
 import { Card } from '../../components/common/Card';
 import toast, { Toaster } from 'react-hot-toast';
 import { format } from 'date-fns';
+import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 export const VendorDashboardPage: React.FC = () => {
   const [restaurant, setRestaurant] = useState<any>(null);
@@ -52,6 +53,21 @@ export const VendorDashboardPage: React.FC = () => {
     }
   };
 
+  const stats = {
+    total: reservations.length,
+    pending: reservations.filter(r => r.status === ReservationStatus.PENDING).length,
+    confirmed: reservations.filter(r => r.status === ReservationStatus.CONFIRMED).length,
+    completed: reservations.filter(r => r.status === ReservationStatus.COMPLETED).length,
+    cancelled: reservations.filter(r => r.status === ReservationStatus.CANCELLED).length,
+  };
+
+  const pieData = [
+    { name: 'Pending', value: stats.pending, color: '#F59E0B' }, // yellow-500
+    { name: 'Confirmed', value: stats.confirmed, color: '#10B981' }, // green-500
+    { name: 'Completed', value: stats.completed, color: '#8B5CF6' }, // purple-500
+    { name: 'Cancelled', value: stats.cancelled, color: '#EF4444' }, // red-500
+  ].filter(item => item.value > 0);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-neutral-50 py-8">
@@ -88,13 +104,6 @@ export const VendorDashboardPage: React.FC = () => {
       </div>
     );
   }
-
-  const stats = {
-    total: reservations.length,
-    pending: reservations.filter(r => r.status === ReservationStatus.PENDING).length,
-    confirmed: reservations.filter(r => r.status === ReservationStatus.CONFIRMED).length,
-    completed: reservations.filter(r => r.status === ReservationStatus.COMPLETED).length,
-  };
 
   const pendingReservations = reservations
     .filter(r => r.status === ReservationStatus.PENDING)
@@ -204,37 +213,78 @@ export const VendorDashboardPage: React.FC = () => {
           </motion.div>
         </div>
 
-        {/* Pending Reservations */}
-        {pendingReservations.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-neutral-900 mb-6 flex items-center">
-              <Clock className="w-6 h-6 text-yellow-500 mr-2" />
-              Pending Approval ({pendingReservations.length})
-            </h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {pendingReservations.map((reservation) => (
-                <div key={reservation.id}>
-                  <ReservationCard reservation={reservation} showCustomer />
-                  <div className="flex gap-3 mt-4">
-                    <Button
-                      variant="primary"
-                      fullWidth
-                      onClick={() => handleStatusUpdate(reservation.id, ReservationStatus.CONFIRMED)}
-                      leftIcon={<CheckCircle className="w-4 h-4" />}
+        {/* Analytics Section */}
+        {reservations.length > 0 && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <Card className="col-span-1 lg:col-span-1 p-6 flex flex-col items-center justify-center min-h-[300px]">
+              <h3 className="text-lg font-bold text-neutral-900 mb-4 flex items-center">
+                <PieChart className="w-5 h-5 mr-2 text-primary-500" />
+                Reservation Status
+              </h3>
+              <div className="w-full h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RePieChart>
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={5}
+                      dataKey="value"
                     >
-                      Confirm
-                    </Button>
-                    <Button
-                      variant="outline"
-                      fullWidth
-                      onClick={() => handleStatusUpdate(reservation.id, ReservationStatus.CANCELLED)}
-                      leftIcon={<XCircle className="w-4 h-4" />}
-                    >
-                      Reject
-                    </Button>
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </RePieChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
+            
+            <div className="col-span-1 lg:col-span-2">
+              {/* Pending Reservations */}
+              {pendingReservations.length > 0 ? (
+                <div className="mb-8">
+                  <h2 className="text-2xl font-bold text-neutral-900 mb-6 flex items-center">
+                    <Clock className="w-6 h-6 text-yellow-500 mr-2" />
+                    Pending Approval ({pendingReservations.length})
+                  </h2>
+                  <div className="grid grid-cols-1 gap-6">
+                    {pendingReservations.map((reservation) => (
+                      <div key={reservation.id}>
+                        <ReservationCard reservation={reservation} showCustomer />
+                        <div className="flex gap-3 mt-4">
+                          <Button
+                            variant="primary"
+                            fullWidth
+                            onClick={() => handleStatusUpdate(reservation.id, ReservationStatus.CONFIRMED)}
+                            leftIcon={<CheckCircle className="w-4 h-4" />}
+                          >
+                            Confirm
+                          </Button>
+                          <Button
+                            variant="outline"
+                            fullWidth
+                            onClick={() => handleStatusUpdate(reservation.id, ReservationStatus.CANCELLED)}
+                            leftIcon={<XCircle className="w-4 h-4" />}
+                          >
+                            Reject
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
+              ) : (
+                <div className="bg-white rounded-xl p-8 text-center border border-neutral-200 h-full flex flex-col justify-center">
+                  <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-neutral-900">All caught up!</h3>
+                  <p className="text-neutral-500">No pending reservations to review.</p>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -265,7 +315,7 @@ export const VendorDashboardPage: React.FC = () => {
           </div>
         )}
 
-        {/* No Reservations */}
+        {/* No Reservations State */}
         {reservations.length === 0 && (
           <div className="text-center py-20">
             <div className="w-24 h-24 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-6">

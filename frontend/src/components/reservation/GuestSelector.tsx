@@ -13,7 +13,7 @@ export const GuestSelector: React.FC<GuestSelectorProps> = ({
   guestCount,
   onGuestCountChange,
   min = 1,
-  max = 20,
+  max = 12,
 }) => {
   const handleDecrement = () => {
     if (guestCount > min) {

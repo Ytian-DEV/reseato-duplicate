@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Filter, Utensils, MapPin } from 'lucide-react';
 import { Restaurant } from '../../../../shared/types';
 import restaurantService from '../../services/restaurantService';
 import { RestaurantCard } from '../../components/restaurant/RestaurantCard';
 import { Button } from '../../components/common/Button';
+import { Card } from '../../components/common/Card';
 import { SimpleMap } from '../../components/common/SimpleMap';
 
 const cuisineTypes = [
@@ -29,13 +31,40 @@ export const HomePage: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [activeMall, setActiveMall] = useState<'SM City' | 'SM Seaside' | null>(null);
 
+  const [suggestions, setSuggestions] = useState<Restaurant[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const navigate = useNavigate();
+
   useEffect(() => {
     loadRestaurants();
   }, []);
 
   useEffect(() => {
-    filterRestaurants();
-  }, [searchTerm, selectedCuisine, activeMall, restaurants]);
+    if (searchTerm) {
+      const matches = restaurants.filter(r => 
+        r.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setSuggestions(matches);
+      setShowSuggestions(true);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [searchTerm, restaurants]);
+
+  const handleSearch = () => {
+    if (searchTerm) {
+      // Find exact match or first suggestion
+      const match = restaurants.find(r => r.name.toLowerCase() === searchTerm.toLowerCase()) || suggestions[0];
+      if (match) {
+        navigate(`/restaurant/${match.id}`);
+      }
+    }
+  };
+
+  const handleSuggestionClick = (restaurantId: string) => {
+    navigate(`/restaurant/${restaurantId}`);
+  };
 
   const loadRestaurants = async () => {
     try {
@@ -74,11 +103,11 @@ export const HomePage: React.FC = () => {
     if (activeMall) {
       if (activeMall === 'SM City') {
         filtered = filtered.filter(r => 
-          ['Sachi & Rasa', 'Chika-an Cebuano Kitchen', 'Superbowl of China'].includes(r.name)
+          ['Sachi Ramen', 'Seafood & Ribs Warehouse', 'Mesa Restaurant Philippines', 'Chika-an Cebuano Kitchen', 'Superbowl of China'].includes(r.name) || r.address.includes('SM City Cebu')
         );
       } else if (activeMall === 'SM Seaside') {
         filtered = filtered.filter(r => 
-          ['Cabalen', 'Seaside Delight'].includes(r.name)
+          ['Seoul Black', 'Seafood & Ribs Warehouse', 'Kuya J', 'Somac Korean Restaurant', 'Mesa Restaurant Philippines', 'Boy Belly', 'Cabalen'].includes(r.name) || r.address.includes('SM Seaside')
         );
       }
     }
@@ -132,6 +161,24 @@ export const HomePage: React.FC = () => {
             style={{ borderRadius: '30% 70% 70% 30% / 30% 30% 70% 70%' }}
             alt="Floating Salad"
           />
+          <motion.img
+            src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=500&q=80"
+            className="absolute top-[20%] left-[-5%] md:top-[30%] md:left-[10%] w-28 h-28 md:w-40 md:h-40 object-cover rounded-full shadow-2xl rotate-12 opacity-50 md:opacity-70 hover:opacity-100 transition-opacity duration-500 animate-float-slow"
+            style={{ borderRadius: '50% 50% 50% 50% / 50% 50% 50% 50%' }}
+            alt="Floating Sushi"
+          />
+          <motion.img
+            src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=500&q=80"
+            className="absolute bottom-[20%] right-[-5%] md:bottom-[30%] md:right-[10%] w-32 h-32 md:w-44 md:h-44 object-cover rounded-full shadow-2xl -rotate-12 opacity-50 md:opacity-70 hover:opacity-100 transition-opacity duration-500 animate-float-medium"
+            style={{ borderRadius: '40% 60% 60% 40% / 40% 40% 60% 60%' }}
+            alt="Floating Drink"
+          />
+          <motion.img
+            src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500&q=80"
+            className="absolute top-[80%] left-[20%] md:top-[70%] md:left-[25%] w-24 h-24 md:w-32 md:h-32 object-cover rounded-full shadow-xl rotate-45 opacity-40 md:opacity-60 hover:opacity-100 transition-opacity duration-500 animate-float-fast"
+            style={{ borderRadius: '30% 70% 70% 30% / 30% 30% 70% 70%' }}
+            alt="Floating Bowl"
+          />
         </div>
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-12 md:py-0">
@@ -152,19 +199,52 @@ export const HomePage: React.FC = () => {
             </p>
 
             {/* Search Bar */}
-            <div className="max-w-4xl mx-auto mb-10 md:mb-16 relative z-20">
+            <div className="max-w-4xl mx-auto mb-10 md:mb-16 relative z-50">
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4 bg-white/80 backdrop-blur-xl border border-white/50 rounded-2xl md:rounded-3xl p-2 md:p-3 shadow-warm-lg hover:shadow-warm transition-shadow duration-300">
                 <div className="flex-1 relative flex items-center">
                   <Search className="absolute left-4 md:left-6 w-5 h-5 md:w-6 md:h-6 text-neutral-400" />
                   <input
                     type="text"
-                    placeholder="What are you craving today?"
+                    placeholder="Search for a restaurant..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                     className="w-full pl-12 md:pl-16 pr-4 md:pr-6 py-3 md:py-4 bg-transparent border-none focus:outline-none text-base md:text-lg text-neutral-800 placeholder-neutral-400 font-medium"
+                    autoComplete="off"
                   />
+                  
+                  {/* Custom Suggestions Dropdown */}
+                  <AnimatePresence>
+                    {showSuggestions && suggestions.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-neutral-100 overflow-hidden max-h-60 overflow-y-auto"
+                      >
+                        {suggestions.map((restaurant) => (
+                          <button
+                            key={restaurant.id}
+                            onClick={() => handleSuggestionClick(restaurant.id)}
+                            className="w-full text-left px-6 py-3 hover:bg-primary-50 transition-colors flex items-center justify-between group"
+                          >
+                            <span className="font-medium text-neutral-700 group-hover:text-primary-700">
+                              {restaurant.name}
+                            </span>
+                            <span className="text-xs text-neutral-400 group-hover:text-primary-400">
+                              {restaurant.cuisineType}
+                            </span>
+                          </button>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
-                <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white shadow-lg shadow-primary-500/30 rounded-xl md:rounded-2xl px-6 md:px-10 py-3 md:py-4 text-base md:text-lg font-semibold transition-all duration-300 hover:scale-105">
+                <Button 
+                  size="lg" 
+                  onClick={handleSearch}
+                  className="w-full sm:w-auto bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white shadow-lg shadow-primary-500/30 rounded-xl md:rounded-2xl px-6 md:px-10 py-3 md:py-4 text-base md:text-lg font-semibold transition-all duration-300 hover:scale-105"
+                >
                   <Search className="w-5 h-5 sm:mr-2" />
                   <span className="inline sm:inline">Find Table</span>
                 </Button>
@@ -172,140 +252,56 @@ export const HomePage: React.FC = () => {
             </div>
 
             {/* Mall Map Selector */}
-            <div className="max-w-5xl mx-auto mb-16">
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-neutral-800 flex items-center justify-center gap-2 mb-2">
-                  <MapPin className="w-6 h-6 text-primary-500" />
-                  Find Your Flavor
+            <div className="max-w-3xl mx-auto mb-12">
+              <Card className="bg-white/80 backdrop-blur-md p-4 md:p-6 border border-white/60">
+                <h3 className="text-lg font-bold text-neutral-800 mb-4 flex items-center justify-center gap-2">
+                  <MapPin className="w-5 h-5 text-primary-500" />
+                  Explore by Location
                 </h3>
-                <p className="text-neutral-500">Select a location to see available restaurants</p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 px-4">
-                {/* SM City Card */}
-                <motion.div
-                  whileHover={{ y: -5 }}
-                  className={`
-                    relative bg-white rounded-3xl overflow-hidden shadow-xl transition-all duration-300 border-2
-                    ${activeMall === 'SM City' ? 'border-primary-500 shadow-primary-500/20 scale-[1.02]' : 'border-transparent hover:border-primary-200'}
-                  `}
-                >
-                  <div className="h-64 relative">
-                    {activeMall === 'SM City' ? (
-                      <SimpleMap locationName="SM City Cebu" className="h-full w-full" title="SM City Cebu" />
-                    ) : (
-                      <>
-                        <img 
-                          src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/SM_City_Cebu_Main_Mall.jpg/1200px-SM_City_Cebu_Main_Mall.jpg" 
-                          alt="SM City Cebu"
-                          className="w-full h-full object-cover filter brightness-90 transition-transform duration-700 hover:scale-110"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                      </>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => setActiveMall(activeMall === 'SM City' ? null : 'SM City')}
+                      className={`
+                        w-full relative overflow-hidden rounded-xl h-48 group transition-all duration-300 text-left
+                        ${activeMall === 'SM City' ? 'ring-4 ring-primary-500 ring-offset-2' : 'hover:shadow-lg'}
+                      `}
+                    >
+                      <SimpleMap locationName="SM City Cebu" className="absolute inset-0 w-full h-full" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none flex flex-col justify-end p-4">
+                        <span className="text-white font-bold text-lg">SM City Cebu</span>
+                        <span className="text-white/80 text-xs">Sachi, Chika-an, Superbowl, Mesa</span>
+                      </div>
+                    </button>
+                    {activeMall === 'SM City' && (
+                      <div className="text-center text-sm text-primary-600 font-medium animate-fade-in">
+                        Showing restaurants in SM City Cebu
+                      </div>
                     )}
-                    
-                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                      <h4 className="text-2xl font-bold mb-2">SM City Cebu</h4>
-                      <p className="text-white/80 text-sm mb-4 line-clamp-2">
-                        North Reclamation Area, Cebu City
-                      </p>
-                      <button
-                        onClick={() => setActiveMall(activeMall === 'SM City' ? null : 'SM City')}
-                        className={`
-                          w-full py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2
-                          ${activeMall === 'SM City' 
-                            ? 'bg-white text-primary-600 hover:bg-neutral-50' 
-                            : 'bg-primary-500/20 backdrop-blur-md border border-white/30 hover:bg-primary-500 text-white'}
-                        `}
-                      >
-                        {activeMall === 'SM City' ? (
-                          <>
-                            <Utensils className="w-4 h-4" /> View All Restaurants
-                          </>
-                        ) : (
-                          <>
-                            <MapPin className="w-4 h-4" /> Explore Location
-                          </>
-                        )}
-                      </button>
-                    </div>
                   </div>
-                  
-                  {/* Quick Restaurant Preview */}
-                  <div className="bg-neutral-50 p-4 border-t border-neutral-100">
-                    <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-3">Featured Here</p>
-                    <div className="flex flex-wrap gap-2">
-                      {['Sachi & Rasa', 'Chika-an', 'Superbowl'].map(name => (
-                        <span key={name} className="px-3 py-1 bg-white border border-neutral-200 rounded-full text-xs font-medium text-neutral-600">
-                          {name}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
 
-                {/* SM Seaside Card */}
-                <motion.div
-                  whileHover={{ y: -5 }}
-                  className={`
-                    relative bg-white rounded-3xl overflow-hidden shadow-xl transition-all duration-300 border-2
-                    ${activeMall === 'SM Seaside' ? 'border-primary-500 shadow-primary-500/20 scale-[1.02]' : 'border-transparent hover:border-primary-200'}
-                  `}
-                >
-                  <div className="h-64 relative">
-                    {activeMall === 'SM Seaside' ? (
-                      <SimpleMap locationName="SM Seaside City Cebu" className="h-full w-full" title="SM Seaside City" />
-                    ) : (
-                      <>
-                        <img 
-                          src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/SM_Seaside_City_Cebu_Facade.jpg/1200px-SM_Seaside_City_Cebu_Facade.jpg" 
-                          alt="SM Seaside City"
-                          className="w-full h-full object-cover filter brightness-90 transition-transform duration-700 hover:scale-110"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                      </>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => setActiveMall(activeMall === 'SM Seaside' ? null : 'SM Seaside')}
+                      className={`
+                        w-full relative overflow-hidden rounded-xl h-48 group transition-all duration-300 text-left
+                        ${activeMall === 'SM Seaside' ? 'ring-4 ring-primary-500 ring-offset-2' : 'hover:shadow-lg'}
+                      `}
+                    >
+                      <SimpleMap locationName="SM Seaside City Cebu" className="absolute inset-0 w-full h-full" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none flex flex-col justify-end p-4">
+                        <span className="text-white font-bold text-lg">SM Seaside</span>
+                        <span className="text-white/80 text-xs">Cabalen, Seoul Black, Kuya J, Somac</span>
+                      </div>
+                    </button>
+                    {activeMall === 'SM Seaside' && (
+                      <div className="text-center text-sm text-primary-600 font-medium animate-fade-in">
+                        Showing restaurants in SM Seaside
+                      </div>
                     )}
-                    
-                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                      <h4 className="text-2xl font-bold mb-2">SM Seaside City</h4>
-                      <p className="text-white/80 text-sm mb-4 line-clamp-2">
-                        South Road Properties, Cebu City
-                      </p>
-                      <button
-                        onClick={() => setActiveMall(activeMall === 'SM Seaside' ? null : 'SM Seaside')}
-                        className={`
-                          w-full py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2
-                          ${activeMall === 'SM Seaside' 
-                            ? 'bg-white text-primary-600 hover:bg-neutral-50' 
-                            : 'bg-primary-500/20 backdrop-blur-md border border-white/30 hover:bg-primary-500 text-white'}
-                        `}
-                      >
-                        {activeMall === 'SM Seaside' ? (
-                          <>
-                            <Utensils className="w-4 h-4" /> View All Restaurants
-                          </>
-                        ) : (
-                          <>
-                            <MapPin className="w-4 h-4" /> Explore Location
-                          </>
-                        )}
-                      </button>
-                    </div>
                   </div>
-                  
-                  {/* Quick Restaurant Preview */}
-                  <div className="bg-neutral-50 p-4 border-t border-neutral-100">
-                    <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-3">Featured Here</p>
-                    <div className="flex flex-wrap gap-2">
-                      {['Cabalen', 'Seaside Delight'].map(name => (
-                        <span key={name} className="px-3 py-1 bg-white border border-neutral-200 rounded-full text-xs font-medium text-neutral-600">
-                          {name}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
+                </div>
+              </Card>
             </div>
 
             {/* Quick Stats */}

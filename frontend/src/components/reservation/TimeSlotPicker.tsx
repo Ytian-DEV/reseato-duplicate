@@ -69,6 +69,17 @@ export const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({
     );
   }
 
+  const formatTime = (time: string) => {
+    const [hours, minutes] = time.split(':');
+    const date = new Date();
+    date.setHours(parseInt(hours), parseInt(minutes));
+    return date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
   const getTimeOfDay = (time: string) => {
     const hour = parseInt(time.split(':')[0]);
     if (hour < 12) return 'Morning';
@@ -127,7 +138,12 @@ export const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({
                       {isSelected && (
                         <CheckCircle className="w-3 h-3 absolute top-1 right-1" />
                       )}
-                      <div>{slot.time}</div>
+                      <div>{formatTime(slot.time)}</div>
+                      {isAvailable && (
+                        <div className="text-[10px] opacity-80 mt-0.5">
+                          {slot.tablesAvailable} tables left
+                        </div>
+                      )}
                     </motion.button>
                   );
                 })}

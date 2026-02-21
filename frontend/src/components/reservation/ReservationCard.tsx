@@ -170,10 +170,12 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
         {/* Payment Info */}
         <div className="mt-4 pt-4 border-t border-neutral-200">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-neutral-600">Commission Paid</span>
-            <span className={`font-semibold ${reservation.commissionPaid ? 'text-green-600' : 'text-yellow-600'}`}>
-              {reservation.commissionPaid ? '✓ ₱30.00' : 'Pending'}
-            </span>
+            <span className="text-neutral-600">Restaurant</span>
+            <span className="font-semibold text-neutral-900">{reservation.restaurantName || 'Loading...'}</span>
+          </div>
+          <div className="flex items-center justify-between text-sm mt-2">
+            <span className="text-neutral-600">Location</span>
+            <span className="text-neutral-900 text-right">{reservation.restaurantAddress || 'Loading...'}</span>
           </div>
         </div>
       </div>

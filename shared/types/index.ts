@@ -93,6 +93,9 @@ export interface Reservation {
   commissionPaid?: boolean; // Added to match usage
   createdAt: Date | string;
   updatedAt: Date | string;
+  restaurantName?: string; // New field
+  restaurantAddress?: string; // New field
+  tableNumber?: string; // New field
 }
 
 export interface CreateReservationDTO {

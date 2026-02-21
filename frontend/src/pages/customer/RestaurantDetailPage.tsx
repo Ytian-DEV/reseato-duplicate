@@ -280,7 +280,7 @@ export const RestaurantDetailPage: React.FC = () => {
                   isLoading={submitting}
                   disabled={!selectedTime}
                 >
-                  Confirm Reservation
+                  Proceed to Payment
                 </Button>
 
                 <p className="text-xs text-center text-neutral-500">

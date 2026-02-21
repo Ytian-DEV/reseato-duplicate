@@ -16,6 +16,16 @@ export class ReservationService {
   ): Promise<Reservation> {
     const { restaurantId, reservationDate, reservationTime, guestCount, specialNotes } = data;
 
+    // Check if user exists
+    const userCheck = await pool.query(
+      'SELECT id FROM users WHERE id = $1',
+      [customerId]
+    );
+
+    if (userCheck.rows.length === 0) {
+      throw new AppError('User not found', 404);
+    }
+
     // Check if restaurant exists and is active
     const restaurantCheck = await pool.query(
       'SELECT id, is_active, opening_time, closing_time FROM restaurants WHERE id = $1',
@@ -58,6 +68,15 @@ export class ReservationService {
       [customerId, restaurantId, availableTable.id, reservationDate, reservationTime, guestCount, specialNotes, ReservationStatus.PENDING]
     );
 
+    const reservation = result.rows[0];
+
+    // Create pending payment record
+    await pool.query(
+      `INSERT INTO payments (reservation_id, amount, payment_method, payment_status)
+       VALUES ($1, $2, $3, $4)`,
+      [reservation.id, 100.00, 'pending', 'pending']
+    );
+
     // Notify Customer (Payment Pending)
     await notificationService.createNotification(
       customerId,
@@ -65,7 +84,7 @@ export class ReservationService {
       'Please complete your payment to confirm the reservation.'
     );
 
-    return this.mapReservation(result.rows[0]);
+    return this.mapReservation(reservation);
   }
 
   async getAvailableTimeSlots(
@@ -224,25 +243,47 @@ export class ReservationService {
     time: string,
     guestCount: number
   ): Promise<any> {
+    // Find tables that fit capacity and are NOT already booked at this time
     const result = await pool.query(
       `SELECT t.* FROM tables t
        WHERE t.restaurant_id = $1 
        AND t.capacity >= $2
-       AND t.is_available = true
        AND t.id NOT IN (
          SELECT table_id FROM reservations
          WHERE restaurant_id = $1
          AND reservation_date = $3
          AND reservation_time = $4
          AND status IN ('pending', 'confirmed')
-         AND table_id IS NOT NULL
        )
        ORDER BY t.capacity ASC
        LIMIT 1`,
       [restaurantId, guestCount, date, time]
     );
 
-    return result.rows[0] || null;
+    // Fallback: If strict match fails, try finding ANY table that isn't booked
+    if (result.rows.length === 0) {
+      const anyFreeTable = await pool.query(
+        `SELECT id FROM tables 
+         WHERE restaurant_id = $1 
+         AND id NOT IN (
+           SELECT table_id FROM reservations
+           WHERE restaurant_id = $1
+           AND reservation_date = $2
+           AND reservation_time = $3
+           AND status IN ('pending', 'confirmed')
+         )
+         LIMIT 1`,
+        [restaurantId, date, time]
+      );
+      
+      if (anyFreeTable.rows.length > 0) {
+        return anyFreeTable.rows[0];
+      }
+      
+      return null;
+    }
+
+    return result.rows[0];
   }
 
   private async countAvailableTables(
@@ -251,6 +292,7 @@ export class ReservationService {
     time: string,
     guestCount: number
   ): Promise<number> {
+    // Check actual database availability
     const result = await pool.query(
       `SELECT COUNT(*) as count FROM tables t
        WHERE t.restaurant_id = $1 
@@ -279,7 +321,12 @@ export class ReservationService {
     const opening = parse(openingTime, 'HH:mm:ss', new Date());
     const closing = parse(closingTime, 'HH:mm:ss', new Date());
 
-    return reservation >= opening && reservation <= closing;
+    // Fix: Just compare the hours and minutes since dates might differ
+    const resMinutes = reservation.getHours() * 60 + reservation.getMinutes();
+    const openMinutes = opening.getHours() * 60 + opening.getMinutes();
+    const closeMinutes = closing.getHours() * 60 + closing.getMinutes();
+
+    return resMinutes >= openMinutes && resMinutes <= closeMinutes;
   }
 
   private mapReservation(row: any): Reservation {
@@ -296,7 +343,10 @@ export class ReservationService {
       specialNotes: row.special_notes,
       commissionPaid: row.commission_paid,
       createdAt: row.created_at,
-      updatedAt: row.updated_at
+      updatedAt: row.updated_at,
+      restaurantName: row.restaurant_name, // Added
+      restaurantAddress: row.restaurant_address, // Added
+      tableNumber: row.table_number // Added
     };
   }
 }

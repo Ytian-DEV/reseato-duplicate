@@ -14,19 +14,43 @@ class PaymentService {
     try {
       await client.query('BEGIN');
 
-      // 1. Create payment record
-      const paymentRes = await client.query(
-        `INSERT INTO payments (reservation_id, amount, payment_method, payment_status, transaction_id)
-         VALUES ($1, $2, $3, $4, $5)
-         RETURNING *`,
-        [
-          reservationId,
-          amount,
-          paymentMethod,
-          PaymentStatus.COMPLETED,
-          `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-        ]
+      // 1. Check if payment exists (pending) and update it, OR insert new if missing
+      const existingPayment = await client.query(
+        'SELECT id FROM payments WHERE reservation_id = $1',
+        [reservationId]
       );
+
+      let paymentRes;
+      if (existingPayment.rows.length > 0) {
+        // Update existing pending payment
+        paymentRes = await client.query(
+          `UPDATE payments 
+           SET amount = $2, payment_method = $3, payment_status = $4, transaction_id = $5, created_at = NOW()
+           WHERE reservation_id = $1
+           RETURNING *`,
+          [
+            reservationId,
+            amount,
+            paymentMethod,
+            PaymentStatus.COMPLETED,
+            `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+          ]
+        );
+      } else {
+        // Insert new (fallback if pending record was deleted or didn't exist)
+        paymentRes = await client.query(
+          `INSERT INTO payments (reservation_id, amount, payment_method, payment_status, transaction_id)
+           VALUES ($1, $2, $3, $4, $5)
+           RETURNING *`,
+          [
+            reservationId,
+            amount,
+            paymentMethod,
+            PaymentStatus.COMPLETED,
+            `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+          ]
+        );
+      }
 
       // 2. Fetch reservation details to notify vendor
       const reservationRes = await client.query(
