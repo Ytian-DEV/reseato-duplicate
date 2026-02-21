@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, Utensils } from 'lucide-react';
+import { Search, Filter, Utensils, MapPin } from 'lucide-react';
 import { Restaurant } from '../../../../shared/types';
 import restaurantService from '../../services/restaurantService';
 import { RestaurantCard } from '../../components/restaurant/RestaurantCard';
 import { Button } from '../../components/common/Button';
+import { SimpleMap } from '../../components/common/SimpleMap';
 
 const cuisineTypes = [
   'All',
@@ -26,6 +27,7 @@ export const HomePage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCuisine, setSelectedCuisine] = useState('All');
   const [showFilters, setShowFilters] = useState(false);
+  const [activeMall, setActiveMall] = useState<'SM City' | 'SM Seaside' | null>(null);
 
   useEffect(() => {
     loadRestaurants();
@@ -33,7 +35,7 @@ export const HomePage: React.FC = () => {
 
   useEffect(() => {
     filterRestaurants();
-  }, [searchTerm, selectedCuisine, restaurants]);
+  }, [searchTerm, selectedCuisine, activeMall, restaurants]);
 
   const loadRestaurants = async () => {
     try {
@@ -68,6 +70,19 @@ export const HomePage: React.FC = () => {
       );
     }
 
+    // Filter by Mall Location
+    if (activeMall) {
+      if (activeMall === 'SM City') {
+        filtered = filtered.filter(r => 
+          ['Sachi & Rasa', 'Chika-an Cebuano Kitchen', 'Superbowl of China'].includes(r.name)
+        );
+      } else if (activeMall === 'SM Seaside') {
+        filtered = filtered.filter(r => 
+          ['Cabalen', 'Seaside Delight'].includes(r.name)
+        );
+      }
+    }
+
     setFilteredRestaurants(filtered);
   };
 
@@ -97,25 +112,20 @@ export const HomePage: React.FC = () => {
           <div className="absolute top-[40%] left-[20%] w-[200px] h-[200px] md:w-[300px] md:h-[300px] rounded-full bg-accent-200/30 blur-[50px] md:blur-[80px] animate-float-fast"></div>
         </div>
 
-        {/* Floating 3D Food Elements - Hidden on very small screens, adjusted for mobile */}
+        {/* Floating 3D Food Elements */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {/* Top Right - Burger */}
           <motion.img
             src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=500&q=80"
             className="absolute top-[5%] right-[-10%] md:top-[10%] md:right-[5%] w-24 h-24 md:w-48 md:h-48 object-cover rounded-full shadow-2xl rotate-12 opacity-60 md:opacity-80 hover:opacity-100 transition-opacity duration-500 animate-float-slow"
             style={{ borderRadius: '40% 60% 70% 30% / 40% 50% 60% 50%' }}
             alt="Floating Burger"
           />
-          
-          {/* Bottom Left - Pizza */}
           <motion.img
             src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=500&q=80"
             className="absolute bottom-[10%] left-[-5%] md:bottom-[15%] md:left-[5%] w-32 h-32 md:w-56 md:h-56 object-cover rounded-full shadow-2xl -rotate-12 opacity-60 md:opacity-80 hover:opacity-100 transition-opacity duration-500 animate-float-medium"
             style={{ borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%' }}
             alt="Floating Pizza"
           />
-
-          {/* Center Right - Salad */}
           <motion.img
             src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=500&q=80"
             className="absolute top-[60%] right-[-5%] md:top-[40%] md:right-[15%] w-20 h-20 md:w-36 md:h-36 object-cover rounded-full shadow-xl rotate-45 opacity-50 md:opacity-60 hover:opacity-100 transition-opacity duration-500 animate-float-fast"
@@ -158,6 +168,143 @@ export const HomePage: React.FC = () => {
                   <Search className="w-5 h-5 sm:mr-2" />
                   <span className="inline sm:inline">Find Table</span>
                 </Button>
+              </div>
+            </div>
+
+            {/* Mall Map Selector */}
+            <div className="max-w-5xl mx-auto mb-16">
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold text-neutral-800 flex items-center justify-center gap-2 mb-2">
+                  <MapPin className="w-6 h-6 text-primary-500" />
+                  Find Your Flavor
+                </h3>
+                <p className="text-neutral-500">Select a location to see available restaurants</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 px-4">
+                {/* SM City Card */}
+                <motion.div
+                  whileHover={{ y: -5 }}
+                  className={`
+                    relative bg-white rounded-3xl overflow-hidden shadow-xl transition-all duration-300 border-2
+                    ${activeMall === 'SM City' ? 'border-primary-500 shadow-primary-500/20 scale-[1.02]' : 'border-transparent hover:border-primary-200'}
+                  `}
+                >
+                  <div className="h-64 relative">
+                    {activeMall === 'SM City' ? (
+                      <SimpleMap locationName="SM City Cebu" className="h-full w-full" title="SM City Cebu" />
+                    ) : (
+                      <>
+                        <img 
+                          src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/SM_City_Cebu_Main_Mall.jpg/1200px-SM_City_Cebu_Main_Mall.jpg" 
+                          alt="SM City Cebu"
+                          className="w-full h-full object-cover filter brightness-90 transition-transform duration-700 hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                      </>
+                    )}
+                    
+                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                      <h4 className="text-2xl font-bold mb-2">SM City Cebu</h4>
+                      <p className="text-white/80 text-sm mb-4 line-clamp-2">
+                        North Reclamation Area, Cebu City
+                      </p>
+                      <button
+                        onClick={() => setActiveMall(activeMall === 'SM City' ? null : 'SM City')}
+                        className={`
+                          w-full py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2
+                          ${activeMall === 'SM City' 
+                            ? 'bg-white text-primary-600 hover:bg-neutral-50' 
+                            : 'bg-primary-500/20 backdrop-blur-md border border-white/30 hover:bg-primary-500 text-white'}
+                        `}
+                      >
+                        {activeMall === 'SM City' ? (
+                          <>
+                            <Utensils className="w-4 h-4" /> View All Restaurants
+                          </>
+                        ) : (
+                          <>
+                            <MapPin className="w-4 h-4" /> Explore Location
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Quick Restaurant Preview */}
+                  <div className="bg-neutral-50 p-4 border-t border-neutral-100">
+                    <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-3">Featured Here</p>
+                    <div className="flex flex-wrap gap-2">
+                      {['Sachi & Rasa', 'Chika-an', 'Superbowl'].map(name => (
+                        <span key={name} className="px-3 py-1 bg-white border border-neutral-200 rounded-full text-xs font-medium text-neutral-600">
+                          {name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* SM Seaside Card */}
+                <motion.div
+                  whileHover={{ y: -5 }}
+                  className={`
+                    relative bg-white rounded-3xl overflow-hidden shadow-xl transition-all duration-300 border-2
+                    ${activeMall === 'SM Seaside' ? 'border-primary-500 shadow-primary-500/20 scale-[1.02]' : 'border-transparent hover:border-primary-200'}
+                  `}
+                >
+                  <div className="h-64 relative">
+                    {activeMall === 'SM Seaside' ? (
+                      <SimpleMap locationName="SM Seaside City Cebu" className="h-full w-full" title="SM Seaside City" />
+                    ) : (
+                      <>
+                        <img 
+                          src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/SM_Seaside_City_Cebu_Facade.jpg/1200px-SM_Seaside_City_Cebu_Facade.jpg" 
+                          alt="SM Seaside City"
+                          className="w-full h-full object-cover filter brightness-90 transition-transform duration-700 hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                      </>
+                    )}
+                    
+                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                      <h4 className="text-2xl font-bold mb-2">SM Seaside City</h4>
+                      <p className="text-white/80 text-sm mb-4 line-clamp-2">
+                        South Road Properties, Cebu City
+                      </p>
+                      <button
+                        onClick={() => setActiveMall(activeMall === 'SM Seaside' ? null : 'SM Seaside')}
+                        className={`
+                          w-full py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2
+                          ${activeMall === 'SM Seaside' 
+                            ? 'bg-white text-primary-600 hover:bg-neutral-50' 
+                            : 'bg-primary-500/20 backdrop-blur-md border border-white/30 hover:bg-primary-500 text-white'}
+                        `}
+                      >
+                        {activeMall === 'SM Seaside' ? (
+                          <>
+                            <Utensils className="w-4 h-4" /> View All Restaurants
+                          </>
+                        ) : (
+                          <>
+                            <MapPin className="w-4 h-4" /> Explore Location
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Quick Restaurant Preview */}
+                  <div className="bg-neutral-50 p-4 border-t border-neutral-100">
+                    <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-3">Featured Here</p>
+                    <div className="flex flex-wrap gap-2">
+                      {['Cabalen', 'Seaside Delight'].map(name => (
+                        <span key={name} className="px-3 py-1 bg-white border border-neutral-200 rounded-full text-xs font-medium text-neutral-600">
+                          {name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
               </div>
             </div>
 
@@ -227,7 +374,10 @@ export const HomePage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl md:text-3xl font-bold text-neutral-900">
-            {filteredRestaurants.length} {filteredRestaurants.length === 1 ? 'Restaurant' : 'Restaurants'} Found
+            {activeMall ? `${activeMall} Restaurants` : 'All Restaurants'}
+            <span className="text-neutral-500 font-normal text-lg ml-3">
+              ({filteredRestaurants.length} found)
+            </span>
           </h2>
         </div>
 

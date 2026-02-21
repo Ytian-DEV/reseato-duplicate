@@ -46,9 +46,9 @@ const seed = async () => {
     const restaurantsData = [
       {
         owner: {
-          email: 'vendor@example.com', // Original vendor
-          firstName: 'John',
-          lastName: 'Vendor',
+          email: 'seasidedelight@reseato.com',
+          firstName: 'Seaside',
+          lastName: 'Manager',
         },
         name: 'Seaside Delight',
         description: 'Experience the best seafood in Cebu with a view of the ocean.',
@@ -78,7 +78,7 @@ const seed = async () => {
         description: 'All-you-can-eat Filipino buffet featuring Kapampangan specialties.',
         cuisine: 'Filipino',
         cuisine_type: 'Buffet',
-        address: 'SM City Cebu, North Reclamation Area',
+        address: 'SM Seaside City, Cebu',
         city: 'Cebu City',
         zip_code: '6000',
         phone: '032-456-7890',
@@ -88,8 +88,8 @@ const seed = async () => {
         is_active: true,
         rating: 4.3,
         total_reviews: 180,
-        latitude: 10.3118,
-        longitude: 123.9182,
+        latitude: 10.2830,
+        longitude: 123.8855,
         image: '/assets/images/cabalen.avif'
       },
       {
@@ -102,7 +102,7 @@ const seed = async () => {
         description: 'Authentic Cebuano dishes served in a homey atmosphere.',
         cuisine: 'Filipino',
         cuisine_type: 'Filipino',
-        address: 'Salinas Drive, Lahug',
+        address: 'SM City Cebu',
         city: 'Cebu City',
         zip_code: '6000',
         phone: '032-233-0350',
@@ -112,8 +112,8 @@ const seed = async () => {
         is_active: true,
         rating: 4.6,
         total_reviews: 150,
-        latitude: 10.3290,
-        longitude: 123.9035,
+        latitude: 10.3115,
+        longitude: 123.9180,
         image: '/assets/images/Chika-an Cebu Kitchen.jpg'
       },
       {
@@ -136,8 +136,8 @@ const seed = async () => {
         is_active: true,
         rating: 4.4,
         total_reviews: 200,
-        latitude: 10.3115,
-        longitude: 123.9180,
+        latitude: 10.3116,
+        longitude: 123.9181,
         image: '/assets/images/Superbowl of China.jpg'
       },
       {
@@ -150,7 +150,7 @@ const seed = async () => {
         description: 'A fusion of Japanese and Asian flavors.',
         cuisine: 'Japanese',
         cuisine_type: 'Asian Fusion',
-        address: 'Ayala Center Cebu',
+        address: 'SM City Cebu',
         city: 'Cebu City',
         zip_code: '6000',
         phone: '032-412-4567',
@@ -160,8 +160,8 @@ const seed = async () => {
         is_active: true,
         rating: 4.7,
         total_reviews: 80,
-        latitude: 10.3173,
-        longitude: 123.9056,
+        latitude: 10.3117,
+        longitude: 123.9182,
         image: '/assets/images/Sachi & rasa restaurant.png'
       }
     ];
