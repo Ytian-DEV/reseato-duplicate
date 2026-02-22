@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { MapPin, Clock, Star, Phone, Mail, Calendar, ArrowLeft } from 'lucide-react';
+import { MapPin, Clock, Star, Phone, Mail, Calendar, ArrowLeft, Moon, Sun } from 'lucide-react';
 import { Restaurant } from '../../../../shared/types';
 import restaurantService from '../../services/restaurantService';
 import reservationService from '../../services/reservationService';
@@ -16,6 +16,7 @@ import { format } from 'date-fns';
 export const RestaurantDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [loading, setLoading] = useState(true);
   
@@ -25,6 +26,30 @@ export const RestaurantDetailPage: React.FC = () => {
   const [selectedTime, setSelectedTime] = useState('');
   const [specialNotes, setSpecialNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  // Toggle dark mode
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+    if (!isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
+
+  // Check for saved preference on mount
+  useEffect(() => {
+    const savedMode = localStorage.getItem('darkMode');
+    if (savedMode === 'true') {
+      setIsDarkMode(true);
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  // Save preference when changed
+  useEffect(() => {
+    localStorage.setItem('darkMode', isDarkMode.toString());
+  }, [isDarkMode]);
 
   useEffect(() => {
     if (id) {
@@ -78,15 +103,25 @@ export const RestaurantDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-neutral-50">
-        <div className="h-96 bg-neutral-200 shimmer"></div>
+      <div className={`min-h-screen ${
+        isDarkMode ? 'bg-gray-900' : 'bg-neutral-50'
+      }`}>
+        <div className={`h-96 shimmer ${
+          isDarkMode ? 'bg-gray-800' : 'bg-neutral-200'
+        }`}></div>
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-4">
-              <div className="h-12 bg-neutral-200 rounded shimmer"></div>
-              <div className="h-32 bg-neutral-200 rounded shimmer"></div>
+              <div className={`h-12 rounded shimmer ${
+                isDarkMode ? 'bg-gray-800' : 'bg-neutral-200'
+              }`}></div>
+              <div className={`h-32 rounded shimmer ${
+                isDarkMode ? 'bg-gray-800' : 'bg-neutral-200'
+              }`}></div>
             </div>
-            <div className="h-96 bg-neutral-200 rounded shimmer"></div>
+            <div className={`h-96 rounded shimmer ${
+              isDarkMode ? 'bg-gray-800' : 'bg-neutral-200'
+            }`}></div>
           </div>
         </div>
       </div>
@@ -102,8 +137,25 @@ export const RestaurantDetailPage: React.FC = () => {
     || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80';
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className={`min-h-screen ${
+      isDarkMode ? 'bg-gray-900' : 'bg-neutral-50'
+    }`}>
       <Toaster position="top-center" />
+
+      {/* Dark Mode Toggle - Bottom Right */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <button
+          onClick={toggleDarkMode}
+          className={`p-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 ${
+            isDarkMode 
+              ? 'bg-purple-900 text-yellow-300 hover:bg-purple-800' 
+              : 'bg-gray-800 text-gray-100 hover:bg-gray-700'
+          }`}
+          aria-label="Toggle dark mode"
+        >
+          {isDarkMode ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
+        </button>
+      </div>
 
       {/* Hero Image */}
       <div className="relative h-64 md:h-96 overflow-hidden">
@@ -117,9 +169,11 @@ export const RestaurantDetailPage: React.FC = () => {
         {/* Back Button */}
         <button
           onClick={() => navigate('/')}
-          className="absolute top-4 left-4 md:top-8 md:left-8 bg-white/90 backdrop-blur-sm p-2 md:p-3 rounded-full hover:bg-white transition-all duration-200 shadow-lg"
+          className={`absolute top-4 left-4 md:top-8 md:left-8 backdrop-blur-sm p-2 md:p-3 rounded-full hover:bg-white/80 transition-all duration-200 shadow-lg ${
+            isDarkMode ? 'bg-gray-800/90 text-white' : 'bg-white/90 text-neutral-900'
+          }`}
         >
-          <ArrowLeft className="w-5 h-5 md:w-6 md:h-6 text-neutral-900" />
+          <ArrowLeft className="w-5 h-5 md:w-6 md:h-6" />
         </button>
 
         {/* Title Overlay */}
@@ -154,28 +208,40 @@ export const RestaurantDetailPage: React.FC = () => {
           {/* Left Column - Details */}
           <div className="lg:col-span-2 space-y-6">
             {/* Description */}
-            <Card>
-              <h2 className="text-2xl font-bold text-neutral-900 mb-4">About</h2>
-              <p className="text-neutral-700 leading-relaxed">{restaurant.description}</p>
+            <Card className={isDarkMode ? 'bg-gray-800' : 'bg-white'}>
+              <h2 className={`text-2xl font-bold mb-4 ${
+                isDarkMode ? 'text-white' : 'text-neutral-900'
+              }`}>About</h2>
+              <p className={isDarkMode ? 'text-gray-300 leading-relaxed' : 'text-neutral-700 leading-relaxed'}>
+                {restaurant.description}
+              </p>
             </Card>
 
             {/* Info */}
-            <Card>
-              <h2 className="text-2xl font-bold text-neutral-900 mb-6">Information</h2>
+            <Card className={isDarkMode ? 'bg-gray-800' : 'bg-white'}>
+              <h2 className={`text-2xl font-bold mb-6 ${
+                isDarkMode ? 'text-white' : 'text-neutral-900'
+              }`}>Information</h2>
               <div className="space-y-4">
                 <div className="flex items-start space-x-3">
                   <MapPin className="w-5 h-5 text-primary-500 mt-1 flex-shrink-0" />
                   <div>
-                    <div className="font-semibold text-neutral-900">Address</div>
-                    <div className="text-neutral-600">{restaurant.address}</div>
+                    <div className={`font-semibold ${
+                      isDarkMode ? 'text-gray-200' : 'text-neutral-900'
+                    }`}>Address</div>
+                    <div className={isDarkMode ? 'text-gray-400' : 'text-neutral-600'}>
+                      {restaurant.address}
+                    </div>
                   </div>
                 </div>
 
                 <div className="flex items-start space-x-3">
                   <Clock className="w-5 h-5 text-primary-500 mt-1 flex-shrink-0" />
                   <div>
-                    <div className="font-semibold text-neutral-900">Hours</div>
-                    <div className="text-neutral-600">
+                    <div className={`font-semibold ${
+                      isDarkMode ? 'text-gray-200' : 'text-neutral-900'
+                    }`}>Hours</div>
+                    <div className={isDarkMode ? 'text-gray-400' : 'text-neutral-600'}>
                       {restaurant.openingTime.slice(0, 5)} - {restaurant.closingTime.slice(0, 5)}
                     </div>
                   </div>
@@ -184,16 +250,24 @@ export const RestaurantDetailPage: React.FC = () => {
                 <div className="flex items-start space-x-3">
                   <Phone className="w-5 h-5 text-primary-500 mt-1 flex-shrink-0" />
                   <div>
-                    <div className="font-semibold text-neutral-900">Phone</div>
-                    <div className="text-neutral-600">{restaurant.phone}</div>
+                    <div className={`font-semibold ${
+                      isDarkMode ? 'text-gray-200' : 'text-neutral-900'
+                    }`}>Phone</div>
+                    <div className={isDarkMode ? 'text-gray-400' : 'text-neutral-600'}>
+                      {restaurant.phone}
+                    </div>
                   </div>
                 </div>
 
                 <div className="flex items-start space-x-3">
                   <Mail className="w-5 h-5 text-primary-500 mt-1 flex-shrink-0" />
                   <div>
-                    <div className="font-semibold text-neutral-900">Email</div>
-                    <div className="text-neutral-600">{restaurant.email}</div>
+                    <div className={`font-semibold ${
+                      isDarkMode ? 'text-gray-200' : 'text-neutral-900'
+                    }`}>Email</div>
+                    <div className={isDarkMode ? 'text-gray-400' : 'text-neutral-600'}>
+                      {restaurant.email}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -201,8 +275,10 @@ export const RestaurantDetailPage: React.FC = () => {
 
             {/* Image Gallery */}
             {restaurant.images && restaurant.images.length > 1 && (
-              <Card>
-                <h2 className="text-2xl font-bold text-neutral-900 mb-6">Gallery</h2>
+              <Card className={isDarkMode ? 'bg-gray-800' : 'bg-white'}>
+                <h2 className={`text-2xl font-bold mb-6 ${
+                  isDarkMode ? 'text-white' : 'text-neutral-900'
+                }`}>Gallery</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {restaurant.images.map((image, index) => (
                     <div key={image.id} className="aspect-square rounded-lg overflow-hidden">
@@ -220,16 +296,24 @@ export const RestaurantDetailPage: React.FC = () => {
 
           {/* Right Column - Reservation Form */}
           <div className="lg:sticky lg:top-24 h-fit">
-            <Card className="shadow-2xl">
+            <Card className={`shadow-2xl ${
+              isDarkMode ? 'bg-gray-800' : 'bg-white'
+            }`}>
               <div className="mb-6">
-                <h3 className="text-2xl font-bold text-neutral-900 mb-2">Reserve a Table</h3>
-                <p className="text-sm text-neutral-600">Commission: ₱30 per booking</p>
+                <h3 className={`text-2xl font-bold mb-2 ${
+                  isDarkMode ? 'text-white' : 'text-neutral-900'
+                }`}>Reserve a Table</h3>
+                <p className={isDarkMode ? 'text-gray-400' : 'text-neutral-600'}>
+                  Commission: ₱30 per booking
+                </p>
               </div>
 
               <div className="space-y-6">
                 {/* Date Picker */}
                 <div>
-                  <label className="flex items-center space-x-2 text-neutral-700 mb-3 font-semibold">
+                  <label className={`flex items-center space-x-2 mb-3 font-semibold ${
+                    isDarkMode ? 'text-gray-200' : 'text-neutral-700'
+                  }`}>
                     <Calendar className="w-5 h-5 text-primary-500" />
                     <span>Select Date</span>
                   </label>
@@ -238,7 +322,11 @@ export const RestaurantDetailPage: React.FC = () => {
                     value={reservationDate}
                     onChange={(e) => setReservationDate(e.target.value)}
                     min={format(new Date(), 'yyyy-MM-dd')}
-                    className="w-full px-4 py-3 bg-white border-2 border-neutral-200 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-200"
+                    className={`w-full px-4 py-3 border-2 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-200 ${
+                      isDarkMode
+                        ? 'bg-gray-700 border-gray-600 text-white'
+                        : 'bg-white border-neutral-200 text-neutral-900'
+                    }`}
                   />
                 </div>
 
@@ -259,7 +347,9 @@ export const RestaurantDetailPage: React.FC = () => {
 
                 {/* Special Notes */}
                 <div>
-                  <label className="block text-neutral-700 mb-2 font-semibold">
+                  <label className={`block mb-2 font-semibold ${
+                    isDarkMode ? 'text-gray-200' : 'text-neutral-700'
+                  }`}>
                     Special Notes (Optional)
                   </label>
                   <textarea
@@ -267,7 +357,11 @@ export const RestaurantDetailPage: React.FC = () => {
                     onChange={(e) => setSpecialNotes(e.target.value)}
                     placeholder="E.g., Birthday celebration, dietary restrictions..."
                     rows={3}
-                    className="w-full px-4 py-3 bg-white border-2 border-neutral-200 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-200 resize-none"
+                    className={`w-full px-4 py-3 border-2 rounded-xl focus:border-primary-500 focus:outline-none transition-all duration-200 resize-none ${
+                      isDarkMode
+                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-500'
+                        : 'bg-white border-neutral-200 text-neutral-900'
+                    }`}
                   />
                 </div>
 
@@ -283,7 +377,9 @@ export const RestaurantDetailPage: React.FC = () => {
                   Proceed to Payment
                 </Button>
 
-                <p className="text-xs text-center text-neutral-500">
+                <p className={`text-xs text-center ${
+                  isDarkMode ? 'text-gray-400' : 'text-neutral-500'
+                }`}>
                   You will be charged ₱100 as reservation fee
                 </p>
               </div>
