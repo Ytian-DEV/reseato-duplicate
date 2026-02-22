@@ -11,6 +11,17 @@ export const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const [termsModalOpen, setTermsModalOpen] = useState(false);
 
+  // Toggle dark mode
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+    if (!isDarkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  };
+
+  // Check for saved preference on mount
   useEffect(() => {
     const user = authService.getStoredUser();
     if (authService.isAuthenticated() && user?.role === UserRole.CUSTOMER) {

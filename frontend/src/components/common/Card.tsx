@@ -22,8 +22,7 @@ export const Card: React.FC<CardProps> = ({
       transition={{ duration: 0.2 }}
       onClick={onClick}
       className={`
-        bg-white rounded-2xl p-6 
-        border border-neutral-200
+        rounded-2xl p-6
         ${hover ? 'cursor-pointer shadow-lg hover:shadow-2xl transition-shadow duration-300' : 'shadow-md'}
         ${className}
       `}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, CheckCircle, XCircle, Users, TrendingUp, PieChart } from 'lucide-react';
+import { Calendar, Clock, CheckCircle, XCircle, Users, TrendingUp, PieChart, Moon, Sun } from 'lucide-react';
 import { Reservation, ReservationStatus } from '../../../../shared/types';
 import restaurantService from '../../services/restaurantService';
 import reservationService from '../../services/reservationService';
@@ -12,10 +12,35 @@ import { format } from 'date-fns';
 import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 export const VendorDashboardPage: React.FC = () => {
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [restaurant, setRestaurant] = useState<any>(null);
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [loading, setLoading] = useState(true);
+
+  // Toggle dark mode
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+    if (!isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
+
+  // Check for saved preference on mount
+  useEffect(() => {
+    const savedMode = localStorage.getItem('darkMode');
+    if (savedMode === 'true') {
+      setIsDarkMode(true);
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  // Save preference when changed
+  useEffect(() => {
+    localStorage.setItem('darkMode', isDarkMode.toString());
+  }, [isDarkMode]);
 
   useEffect(() => {
     loadDashboardData();
@@ -62,23 +87,31 @@ export const VendorDashboardPage: React.FC = () => {
   };
 
   const pieData = [
-    { name: 'Pending', value: stats.pending, color: '#F59E0B' }, // yellow-500
-    { name: 'Confirmed', value: stats.confirmed, color: '#10B981' }, // green-500
-    { name: 'Completed', value: stats.completed, color: '#8B5CF6' }, // purple-500
-    { name: 'Cancelled', value: stats.cancelled, color: '#EF4444' }, // red-500
+    { name: 'Pending', value: stats.pending, color: '#F59E0B' },
+    { name: 'Confirmed', value: stats.confirmed, color: '#10B981' },
+    { name: 'Completed', value: stats.completed, color: '#8B5CF6' },
+    { name: 'Cancelled', value: stats.cancelled, color: '#EF4444' },
   ].filter(item => item.value > 0);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-neutral-50 py-8">
+      <div className={`min-h-screen transition-colors duration-300 ${
+        isDarkMode ? 'bg-gray-900' : 'bg-neutral-50'
+      } py-8`}>
         <div className="max-w-7xl mx-auto px-4">
-          <div className="h-12 bg-neutral-200 rounded shimmer mb-8 w-1/3"></div>
+          <div className={`h-12 rounded shimmer mb-8 w-1/3 ${
+            isDarkMode ? 'bg-gray-800' : 'bg-neutral-200'
+          }`}></div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-32 bg-neutral-200 rounded-xl shimmer"></div>
+              <div key={i} className={`h-32 rounded-xl shimmer ${
+                isDarkMode ? 'bg-gray-800' : 'bg-neutral-200'
+              }`}></div>
             ))}
           </div>
-          <div className="h-96 bg-neutral-200 rounded-xl shimmer"></div>
+          <div className={`h-96 rounded-xl shimmer ${
+            isDarkMode ? 'bg-gray-800' : 'bg-neutral-200'
+          }`}></div>
         </div>
       </div>
     );
@@ -86,15 +119,23 @@ export const VendorDashboardPage: React.FC = () => {
 
   if (!restaurant) {
     return (
-      <div className="min-h-screen bg-neutral-50 py-20">
+      <div className={`min-h-screen transition-colors duration-300 ${
+        isDarkMode ? 'bg-gray-900' : 'bg-neutral-50'
+      } py-20`}>
         <div className="max-w-2xl mx-auto px-4 text-center">
-          <div className="w-24 h-24 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Users className="w-12 h-12 text-neutral-400" />
+          <div className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 ${
+            isDarkMode ? 'bg-gray-800' : 'bg-neutral-100'
+          }`}>
+            <Users className={`w-12 h-12 ${
+              isDarkMode ? 'text-gray-600' : 'text-neutral-400'
+            }`} />
           </div>
-          <h2 className="text-3xl font-bold text-neutral-900 mb-4">
+          <h2 className={`text-3xl font-bold mb-4 ${
+            isDarkMode ? 'text-white' : 'text-neutral-900'
+          }`}>
             No Restaurant Found
           </h2>
-          <p className="text-neutral-600 mb-8">
+          <p className={isDarkMode ? 'text-gray-400 mb-8' : 'text-neutral-600 mb-8'}>
             You need to create a restaurant profile first to access the dashboard.
           </p>
           <Button variant="primary" size="lg">
@@ -114,7 +155,27 @@ export const VendorDashboardPage: React.FC = () => {
     .sort((a, b) => a.reservationTime.localeCompare(b.reservationTime));
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-neutral-50 to-white py-8">
+    <div className={`min-h-screen transition-colors duration-300 ${
+      isDarkMode 
+        ? 'bg-gradient-to-b from-gray-900 to-gray-800' 
+        : 'bg-gradient-to-b from-neutral-50 to-white'
+    } py-8`}>
+      
+      {/* Dark Mode Toggle - Bottom Right */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <button
+          onClick={toggleDarkMode}
+          className={`p-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 ${
+            isDarkMode 
+              ? 'bg-purple-900 text-yellow-300 hover:bg-purple-800' 
+              : 'bg-gray-800 text-gray-100 hover:bg-gray-700'
+          }`}
+          aria-label="Toggle dark mode"
+        >
+          {isDarkMode ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
+        </button>
+      </div>
+
       <Toaster position="top-center" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -124,24 +185,34 @@ export const VendorDashboardPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-2">
+          <h1 className={`text-3xl md:text-4xl font-bold mb-2 ${
+            isDarkMode ? 'text-white' : 'text-neutral-900'
+          }`}>
             {restaurant.name}
           </h1>
-          <p className="text-neutral-600">Dashboard Overview</p>
+          <p className={isDarkMode ? 'text-gray-400' : 'text-neutral-600'}>Dashboard Overview</p>
         </motion.div>
 
         {/* Date Selector */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+        <div className={`rounded-2xl shadow-lg p-6 mb-8 ${
+          isDarkMode ? 'bg-gray-800' : 'bg-white'
+        }`}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center space-x-2">
               <Calendar className="w-5 h-5 text-primary-500" />
-              <span className="font-semibold text-neutral-700">Select Date</span>
+              <span className={`font-semibold ${
+                isDarkMode ? 'text-gray-200' : 'text-neutral-700'
+              }`}>Select Date</span>
             </div>
             <input
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="w-full sm:w-auto px-4 py-2 bg-neutral-50 border-2 border-neutral-200 rounded-lg focus:border-primary-500 focus:outline-none transition-all duration-200"
+              className={`w-full sm:w-auto px-4 py-2 border-2 rounded-lg focus:border-primary-500 focus:outline-none transition-all duration-200 ${
+                isDarkMode
+                  ? 'bg-gray-700 border-gray-600 text-white'
+                  : 'bg-neutral-50 border-neutral-200 text-neutral-900'
+              }`}
             />
           </div>
         </div>
@@ -216,8 +287,12 @@ export const VendorDashboardPage: React.FC = () => {
         {/* Analytics Section */}
         {reservations.length > 0 && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            <Card className="col-span-1 lg:col-span-1 p-6 flex flex-col items-center justify-center min-h-[300px]">
-              <h3 className="text-lg font-bold text-neutral-900 mb-4 flex items-center">
+            <Card className={`col-span-1 lg:col-span-1 p-6 flex flex-col items-center justify-center min-h-[300px] ${
+              isDarkMode ? 'bg-gray-800' : 'bg-white'
+            }`}>
+              <h3 className={`text-lg font-bold mb-4 flex items-center ${
+                isDarkMode ? 'text-white' : 'text-neutral-900'
+              }`}>
                 <PieChart className="w-5 h-5 mr-2 text-primary-500" />
                 Reservation Status
               </h3>
@@ -248,7 +323,9 @@ export const VendorDashboardPage: React.FC = () => {
               {/* Pending Reservations */}
               {pendingReservations.length > 0 ? (
                 <div className="mb-8">
-                  <h2 className="text-2xl font-bold text-neutral-900 mb-6 flex items-center">
+                  <h2 className={`text-2xl font-bold mb-6 flex items-center ${
+                    isDarkMode ? 'text-white' : 'text-neutral-900'
+                  }`}>
                     <Clock className="w-6 h-6 text-yellow-500 mr-2" />
                     Pending Approval ({pendingReservations.length})
                   </h2>
@@ -279,10 +356,18 @@ export const VendorDashboardPage: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <div className="bg-white rounded-xl p-8 text-center border border-neutral-200 h-full flex flex-col justify-center">
+                <div className={`rounded-xl p-8 text-center border h-full flex flex-col justify-center ${
+                  isDarkMode 
+                    ? 'bg-gray-800 border-gray-700' 
+                    : 'bg-white border-neutral-200'
+                }`}>
                   <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-neutral-900">All caught up!</h3>
-                  <p className="text-neutral-500">No pending reservations to review.</p>
+                  <h3 className={`text-lg font-semibold ${
+                    isDarkMode ? 'text-white' : 'text-neutral-900'
+                  }`}>All caught up!</h3>
+                  <p className={isDarkMode ? 'text-gray-400' : 'text-neutral-500'}>
+                    No pending reservations to review.
+                  </p>
                 </div>
               )}
             </div>
@@ -292,7 +377,9 @@ export const VendorDashboardPage: React.FC = () => {
         {/* Confirmed Reservations */}
         {confirmedReservations.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-neutral-900 mb-6 flex items-center">
+            <h2 className={`text-2xl font-bold mb-6 flex items-center ${
+              isDarkMode ? 'text-white' : 'text-neutral-900'
+            }`}>
               <CheckCircle className="w-6 h-6 text-green-500 mr-2" />
               Confirmed Reservations ({confirmedReservations.length})
             </h2>
@@ -318,13 +405,19 @@ export const VendorDashboardPage: React.FC = () => {
         {/* No Reservations State */}
         {reservations.length === 0 && (
           <div className="text-center py-20">
-            <div className="w-24 h-24 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Calendar className="w-12 h-12 text-neutral-400" />
+            <div className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 ${
+              isDarkMode ? 'bg-gray-800' : 'bg-neutral-100'
+            }`}>
+              <Calendar className={`w-12 h-12 ${
+                isDarkMode ? 'text-gray-600' : 'text-neutral-400'
+              }`} />
             </div>
-            <h3 className="text-2xl font-semibold text-neutral-900 mb-2">
+            <h3 className={`text-2xl font-semibold mb-2 ${
+              isDarkMode ? 'text-white' : 'text-neutral-900'
+            }`}>
               No reservations for {format(new Date(selectedDate), 'MMM dd, yyyy')}
             </h3>
-            <p className="text-neutral-600">
+            <p className={isDarkMode ? 'text-gray-400' : 'text-neutral-600'}>
               Check a different date or wait for new bookings
             </p>
           </div>
