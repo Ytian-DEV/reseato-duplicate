@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { CreditCard, Lock, CheckCircle, Wallet } from 'lucide-react';
 import { Button } from '../../components/common/Button';
 import { Card } from '../../components/common/Card';
+import { TermsModal } from '../../components/common/TermsModal';
 import paymentService from '../../services/paymentService';
 import toast, { Toaster } from 'react-hot-toast';
 
@@ -12,9 +13,18 @@ export const PaymentPage: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('card');
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [termsError, setTermsError] = useState('');
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
 
   const handlePayment = async () => {
     if (!reservationId) return;
+
+    if (!agreedToTerms) {
+      setTermsError('You must agree to the Terms and Conditions to proceed with payment.');
+      return;
+    }
+    setTermsError('');
 
     try {
       setLoading(true);
@@ -134,6 +144,31 @@ export const PaymentPage: React.FC = () => {
                 </p>
               </div>
             )}
+
+            <label className="flex items-start space-x-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={agreedToTerms}
+                onChange={(e) => {
+                  setAgreedToTerms(e.target.checked);
+                  setTermsError('');
+                }}
+                className="mt-1 w-4 h-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
+              />
+              <span className="text-sm text-neutral-600">
+                I have read and agree to the{' '}
+                <button
+                  type="button"
+                  onClick={() => setTermsModalOpen(true)}
+                  className="text-primary-700 hover:text-primary-800 font-medium underline"
+                >
+                  Terms and Conditions
+                </button>
+                . By proceeding with payment, I acknowledge that the reservation is final and non-refundable.
+              </span>
+            </label>
+            <TermsModal isOpen={termsModalOpen} onClose={() => setTermsModalOpen(false)} />
+            {termsError && <p className="text-sm text-red-600">{termsError}</p>}
 
             <Button
               variant="primary"

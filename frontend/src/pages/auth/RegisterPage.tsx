@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Mail, Lock, User, Phone, ArrowRight, Store, Users, ArrowLeft, UtensilsCrossed } from 'lucide-react';
 import { Input } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
+import { TermsModal } from '../../components/common/TermsModal';
 import authService from '../../services/authService';
 import { UserRole } from '../../../../shared/types';
 import toast, { Toaster } from 'react-hot-toast';
@@ -20,6 +21,8 @@ export const RegisterPage: React.FC = () => {
     role: UserRole.CUSTOMER as UserRole,
   });
   const [loading, setLoading] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
   const [errors, setErrors] = useState<any>({});
 
   // Check if user is already logged in
@@ -56,7 +59,8 @@ export const RegisterPage: React.FC = () => {
     
     if (!formData.firstName) newErrors.firstName = 'First name is required';
     if (!formData.lastName) newErrors.lastName = 'Last name is required';
-    
+    if (!agreedToTerms) newErrors.terms = 'You must agree to the Terms and Conditions to continue';
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -217,6 +221,30 @@ export const RegisterPage: React.FC = () => {
               leftIcon={<Lock className="w-5 h-5" />}
             />
 
+            <label className="flex items-start space-x-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={agreedToTerms}
+                onChange={(e) => {
+                  setAgreedToTerms(e.target.checked);
+                  setErrors({ ...errors, terms: '' });
+                }}
+                className="mt-1 w-4 h-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
+              />
+              <span className="text-sm text-neutral-600">
+                I have read and agree to the{' '}
+                <button
+                  type="button"
+                  onClick={(e) => { e.preventDefault(); setTermsModalOpen(true); }}
+                  className="text-primary-700 hover:text-primary-800 font-medium underline"
+                >
+                  Terms and Conditions
+                </button>
+              </span>
+            </label>
+            <TermsModal isOpen={termsModalOpen} onClose={() => setTermsModalOpen(false)} />
+            {errors.terms && <p className="text-sm text-red-600">{errors.terms}</p>}
+
             <Button
               type="submit"
               variant="primary"
@@ -235,12 +263,6 @@ export const RegisterPage: React.FC = () => {
               <Link to="/login" className="text-primary-600 hover:text-primary-700 font-semibold">
                 Sign in
               </Link>
-            </p>
-          </div>
-
-          <div className="mt-8 pt-6 border-t border-neutral-200">
-            <p className="text-xs text-center text-neutral-500">
-              By creating an account, you agree to RESEATO's Terms of Service and Privacy Policy
             </p>
           </div>
         </div>

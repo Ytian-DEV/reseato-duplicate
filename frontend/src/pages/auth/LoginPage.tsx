@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Mail, Lock, ArrowRight, ArrowLeft, UtensilsCrossed, Eye, EyeOff } from 'lucide-react';
 import { Input } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
+import { TermsModal } from '../../components/common/TermsModal';
 import authService from '../../services/authService';
 import toast, { Toaster } from 'react-hot-toast';
 
@@ -13,7 +14,9 @@ export const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({ email: '', password: '' });
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
+  const [errors, setErrors] = useState<{ email: string; password: string; terms?: string }>({ email: '', password: '' });
 
   // Check if user is already logged in
   useEffect(() => {
@@ -37,11 +40,12 @@ export const LoginPage: React.FC = () => {
     e.preventDefault();
     
     // Basic validation
-    const newErrors = { email: '', password: '' };
+    const newErrors: { email: string; password: string; terms?: string } = { email: '', password: '' };
     if (!email) newErrors.email = 'Email is required';
     if (!password) newErrors.password = 'Password is required';
-    
-    if (newErrors.email || newErrors.password) {
+    if (!agreedToTerms) newErrors.terms = 'You must agree to the Terms and Conditions to continue';
+
+    if (newErrors.email || newErrors.password || newErrors.terms) {
       setErrors(newErrors);
       return;
     }
@@ -188,6 +192,30 @@ export const LoginPage: React.FC = () => {
                 </button>
               </div>
 
+              <label className="flex items-start space-x-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={agreedToTerms}
+                  onChange={(e) => {
+                    setAgreedToTerms(e.target.checked);
+                    setErrors((prev) => ({ ...prev, terms: '' }));
+                  }}
+                  className="mt-1 w-4 h-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
+                />
+                <span className="text-sm text-neutral-600">
+                  I have read and agree to the{' '}
+                  <button
+                    type="button"
+                    onClick={(e) => { e.preventDefault(); setTermsModalOpen(true); }}
+                    className="text-primary-700 hover:text-primary-800 font-medium underline"
+                  >
+                    Terms and Conditions
+                  </button>
+                </span>
+              </label>
+              <TermsModal isOpen={termsModalOpen} onClose={() => setTermsModalOpen(false)} />
+              {errors.terms && <p className="text-sm text-red-600">{errors.terms}</p>}
+
               <Button
                 type="submit"
                 variant="primary"
@@ -209,11 +237,6 @@ export const LoginPage: React.FC = () => {
               </p>
             </div>
 
-            <div className="mt-8 pt-8 border-t border-neutral-200">
-              <p className="text-xs text-center text-neutral-500">
-                By continuing, you agree to RESEATO's Terms of Service and Privacy Policy
-              </p>
-            </div>
           </div>
         </motion.div>
       </div>
