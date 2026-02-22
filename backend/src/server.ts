@@ -26,5 +26,4 @@ if (process.env.VERCEL !== '1') {
   startServer();
 }
 
-// Export the Express app for Vercel serverless function
 export default app;
