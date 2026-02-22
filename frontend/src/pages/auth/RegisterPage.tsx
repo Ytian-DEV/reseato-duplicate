@@ -151,7 +151,7 @@ export const RegisterPage: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full max-w-lg" {/* Reduced from max-w-2xl to max-w-lg */}
+        className="w-full max-w-lg"
       >
         <div className={`rounded-2xl shadow-2xl p-6 md:p-8 ${ /* Reduced padding from p-8 md:p-12 to p-6 md:p-8 */
           isDarkMode ? 'bg-gray-800' : 'bg-white'
