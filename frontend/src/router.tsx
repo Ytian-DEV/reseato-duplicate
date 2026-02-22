@@ -10,6 +10,7 @@ import { AdminLayout } from './layouts/AdminLayout';
 
 // Pages
 import { HomePage } from './pages/customer/HomePage';
+import { CustomerDashboardPage } from './pages/customer/CustomerDashboardPage';
 import { RestaurantDetailPage } from './pages/customer/RestaurantDetailPage';
 import { MyReservationsPage } from './pages/customer/MyReservationsPage';
 import { LoginPage } from './pages/auth/LoginPage';
@@ -18,6 +19,8 @@ import { VendorDashboardPage } from './pages/vendor/DashboardPage';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { PaymentPage } from './pages/customer/PaymentPage';
 import { ProfilePage } from './pages/customer/ProfilePage';
+import { AboutPage } from './pages/customer/AboutPage';
+import { TermsPage } from './pages/customer/TermsPage';
 
 // Protected Route Component
 interface ProtectedRouteProps {
@@ -50,6 +53,14 @@ export const AppRouter: React.FC = () => {
         {/* Customer Routes */}
         <Route path="/" element={<CustomerLayout />}>
           <Route index element={<HomePage />} />
+          <Route
+            path="dashboard"
+            element={
+              <ProtectedRoute allowedRoles={[UserRole.CUSTOMER]}>
+                <CustomerDashboardPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="restaurant/:id" element={<RestaurantDetailPage />} />
           <Route
             path="my-reservations"
@@ -75,6 +86,8 @@ export const AppRouter: React.FC = () => {
               </ProtectedRoute>
             }
           />
+          <Route path="about" element={<AboutPage />} />
+          <Route path="terms" element={<TermsPage />} />
         </Route>
 
         {/* Vendor Routes */}

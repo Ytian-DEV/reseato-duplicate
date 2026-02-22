@@ -31,7 +31,7 @@ export const RegisterPage: React.FC = () => {
       } else if (user?.role === 'admin') {
         navigate('/admin/dashboard');
       } else {
-        navigate('/');
+        navigate('/dashboard');
       }
     }
   }, []);
@@ -83,7 +83,7 @@ export const RegisterPage: React.FC = () => {
       if (formData.role === UserRole.VENDOR) {
         navigate('/vendor/dashboard');
       } else {
-        navigate('/');
+        navigate('/dashboard');
       }
     } catch (error: any) {
       toast.error(error.message || 'Registration failed');

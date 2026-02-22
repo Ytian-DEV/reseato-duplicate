@@ -29,7 +29,7 @@ export const LoginPage: React.FC = () => {
     } else if (user?.role === 'admin') {
       navigate('/admin/dashboard');
     } else {
-      navigate('/');
+      navigate('/dashboard');
     }
   };
 
@@ -66,8 +66,8 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50 flex items-center justify-center p-4 relative">
-      <Link to="/" className="absolute top-4 left-4 md:top-8 md:left-8 p-3 rounded-full bg-white/50 hover:bg-white backdrop-blur-sm shadow-sm hover:shadow-md text-neutral-600 hover:text-primary-600 transition-all duration-300 group">
+    <div className="min-h-screen bg-neutral-100 flex items-center justify-center p-4 relative">
+      <Link to="/" className="absolute top-4 left-4 md:top-8 md:left-8 p-3 rounded-sm bg-white/80 hover:bg-white border border-primary-100/50 shadow-sm text-neutral-600 hover:text-primary-700 transition-all duration-300 group">
         <ArrowLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
       </Link>
       <Toaster position="top-center" />
@@ -82,19 +82,19 @@ export const LoginPage: React.FC = () => {
         >
           <div className="space-y-6">
             <div className="flex items-center space-x-3">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-accent-500 rounded-2xl flex items-center justify-center shadow-2xl shadow-primary-500/40">
+              <div className="w-16 h-16 bg-primary-700 rounded-sm flex items-center justify-center shadow-lg">
                 <UtensilsCrossed className="w-10 h-10 text-white" />
               </div>
-              <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-accent-600">RESEATO</h1>
+              <h1 className="text-3xl font-display font-semibold text-primary-800 tracking-wide">RESEATO</h1>
             </div>
 
             <div className="space-y-4">
-              <h2 className="text-4xl font-bold text-neutral-900 leading-tight">
+              <h2 className="text-3xl font-display font-semibold text-neutral-900 leading-tight">
                 Welcome back to
                 <br />
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-accent-600">seamless dining</span>
+                <span className="text-primary-700">seamless dining</span>
               </h2>
-              <p className="text-xl text-neutral-600">
+              <p className="text-lg text-neutral-600">
                 Your favorite restaurants are just a click away.
               </p>
             </div>
@@ -112,8 +112,8 @@ export const LoginPage: React.FC = () => {
                   transition={{ delay: 0.3 + index * 0.1 }}
                   className="flex items-center space-x-3"
                 >
-                  <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-8 h-8 bg-primary-100 rounded-sm flex items-center justify-center">
+                    <svg className="w-5 h-5 text-primary-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
@@ -130,7 +130,7 @@ export const LoginPage: React.FC = () => {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="bg-white rounded-3xl shadow-2xl p-6 md:p-12">
+          <div className="bg-white rounded-lg shadow-xl border border-primary-100/50 p-6 md:p-12">
             <div className="mb-6 md:mb-8">
               <h3 className="text-2xl md:text-3xl font-bold text-neutral-900 mb-2">Sign In</h3>
               <p className="text-sm md:text-base text-neutral-600">Enter your credentials to continue</p>
@@ -182,7 +182,7 @@ export const LoginPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleForgotPassword}
-                  className="text-sm text-primary-600 hover:text-primary-700 font-medium focus:outline-none"
+                  className="text-sm text-primary-700 hover:text-primary-800 font-medium focus:outline-none"
                 >
                   Forgot password?
                 </button>
@@ -203,7 +203,7 @@ export const LoginPage: React.FC = () => {
             <div className="mt-8 text-center">
               <p className="text-neutral-600">
                 Don't have an account?{' '}
-                <Link to="/register" className="text-primary-600 hover:text-primary-700 font-semibold">
+                <Link to="/register" className="text-primary-700 hover:text-primary-800 font-semibold">
                   Sign up for free
                 </Link>
               </p>

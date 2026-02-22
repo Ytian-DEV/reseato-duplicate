@@ -1,14 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --primary-gradient: linear-gradient(135deg, #f0770b 0%, #e15a07 100%);
-  --hero-gradient: linear-gradient(135deg, rgba(240, 119, 11, 0.95) 0%, rgba(225, 90, 7, 0.9) 100%);
+  --primary-gradient: linear-gradient(135deg, #722f37 0%, #5C252B 100%);
+  --hero-gradient: linear-gradient(135deg, rgba(61, 25, 29, 0.92) 0%, rgba(74, 30, 35, 0.88) 100%);
   --bg-pattern: url("https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80");
-  --accent-gradient: linear-gradient(135deg, #f8b437 0%, #f29016 100%);
+  --accent-gradient: linear-gradient(135deg, #b87d7d 0%, #9e5a5a 100%);
+  --maroon: #5C252B;
+  --maroon-light: #722f37;
 }
 
 * {
@@ -26,9 +28,9 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Outfit', system-ui, sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 /* Custom Scrollbar */
@@ -60,7 +62,7 @@ button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 2px solid #f0770b;
+  outline: 2px solid #722f37;
   outline-offset: 2px;
 }
 
@@ -68,7 +70,7 @@ select:focus-visible {
 .glass {
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(240, 119, 11, 0.1);
+  border: 1px solid rgba(114, 47, 55, 0.15);
 }
 
 /* Gradient text */
@@ -91,6 +93,40 @@ select:focus-visible {
 
 .animate-float {
   animation: float 3s ease-in-out infinite;
+}
+
+/* Hero background: slow Ken Burns (zoom + pan) */
+@keyframes heroKenBurns {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    transform: scale(1.08) translate(-1.5%, -1%);
+  }
+  100% {
+    transform: scale(1.12) translate(1%, 1.5%);
+  }
+}
+
+.hero-bg-motion {
+  animation: heroKenBurns 14s ease-in-out infinite;
+}
+
+/* Slower alternate for variety */
+@keyframes heroKenBurnsSlow {
+  0%, 100% {
+    transform: scale(1.05) translate(0, 0);
+  }
+  33% {
+    transform: scale(1.1) translate(1%, 0);
+  }
+  66% {
+    transform: scale(1.08) translate(-0.5%, 1%);
+  }
+}
+
+.hero-bg-motion-slow {
+  animation: heroKenBurnsSlow 30s ease-in-out infinite;
 }
 
 /* Shimmer loading effect */
@@ -203,7 +239,7 @@ select:focus-visible {
 
 .custom-checkbox:checked {
   background: var(--primary-gradient);
-  border-color: #f0770b;
+  border-color: #722f37;
 }
 
 .custom-checkbox:checked::after {
@@ -251,13 +287,13 @@ select:focus-visible {
   color: #3730a3;
 }
 
-/* Warm accent elements */
+/* Luxurious accent elements */
 .warm-glow {
-  box-shadow: 0 0 30px rgba(240, 119, 11, 0.15);
+  box-shadow: 0 0 30px rgba(114, 47, 55, 0.2);
 }
 
 .warm-border {
-  border: 1px solid rgba(240, 119, 11, 0.2);
+  border: 1px solid rgba(114, 47, 55, 0.25);
 }
 
 /* Soft elevation */

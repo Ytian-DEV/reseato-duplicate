@@ -68,7 +68,7 @@ export const Navbar: React.FC<NavbarProps> = ({ user }) => {
   const isActive = (path: string) => location.pathname === path;
 
   const customerLinks = [
-    { name: 'Browse', path: '/' },
+    { name: 'Browse', path: '/dashboard' },
     { name: 'My Reservations', path: '/my-reservations' },
   ];
 
@@ -95,30 +95,30 @@ export const Navbar: React.FC<NavbarProps> = ({ user }) => {
   const links = getLinks();
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-neutral-200">
+    <nav className="sticky top-0 z-50 bg-primary-800 backdrop-blur-xl border-b border-white/10 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/30 group-hover:shadow-primary-500/50 transition-all duration-300 group-hover:scale-105">
-              <UtensilsCrossed className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 bg-white/15 rounded-xl flex items-center justify-center group-hover:bg-white/25 transition-all duration-300">
+              <UtensilsCrossed className="w-5 h-5 text-white" />
             </div>
-            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-accent-600">
+            <span className="text-xl font-display font-semibold text-white tracking-wide">
               RESEATO
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1">
+          <div className="hidden md:flex items-center space-x-2">
             {links.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 className={`
-                  px-4 py-2 rounded-lg font-medium transition-all duration-200
+                  px-4 py-2 rounded-xl font-medium transition-all duration-200
                   ${isActive(link.path)
-                    ? 'text-primary-600 bg-primary-50'
-                    : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                    ? 'text-white bg-white/15'
+                    : 'text-white/85 hover:text-white hover:bg-white/10'
                   }
                 `}
               >
@@ -135,11 +135,11 @@ export const Navbar: React.FC<NavbarProps> = ({ user }) => {
                 <div className="relative">
                   <button
                     onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                    className="p-2 rounded-full hover:bg-neutral-100 transition-colors relative"
+                    className="p-2 rounded-xl hover:bg-white/10 transition-colors relative"
                   >
-                    <Bell className="w-6 h-6 text-neutral-600" />
+                    <Bell className="w-6 h-6 text-white" />
                     {unreadCount > 0 && (
-                      <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                      <span className="absolute top-1 right-1 w-4 h-4 bg-amber-400 text-primary-900 text-xs font-bold rounded-full flex items-center justify-center">
                         {unreadCount}
                       </span>
                     )}
@@ -151,14 +151,14 @@ export const Navbar: React.FC<NavbarProps> = ({ user }) => {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
-                        className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-neutral-200 overflow-hidden z-50"
+                        className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-primary-100 overflow-hidden z-50"
                       >
-                        <div className="p-4 border-b border-neutral-100 flex justify-between items-center">
-                          <h3 className="font-semibold text-neutral-900">Notifications</h3>
+                        <div className="p-4 border-b border-primary-100/50 flex justify-between items-center">
+                          <h3 className="font-semibold text-primary-900">Notifications</h3>
                           {unreadCount > 0 && (
                             <button
                               onClick={handleMarkAllAsRead}
-                              className="text-xs text-primary-600 hover:text-primary-700 font-medium"
+                              className="text-xs text-primary-600 hover:text-primary-800 font-medium"
                             >
                               Mark all read
                             </button>
@@ -173,13 +173,13 @@ export const Navbar: React.FC<NavbarProps> = ({ user }) => {
                             notifications.map((notification) => (
                               <div
                                 key={notification.id}
-                                className={`p-4 border-b border-neutral-50 hover:bg-neutral-50 transition-colors ${
-                                  !notification.isRead ? 'bg-primary-50/30' : ''
+                                className={`p-4 border-b border-primary-100/30 hover:bg-primary-50/30 transition-colors ${
+                                  !notification.isRead ? 'bg-primary-100/20' : ''
                                 }`}
                                 onClick={() => !notification.isRead && handleMarkAsRead(notification.id)}
                               >
                                 <div className="flex justify-between items-start mb-1">
-                                  <h4 className={`text-sm font-medium ${!notification.isRead ? 'text-primary-700' : 'text-neutral-900'}`}>
+                                  <h4 className={`text-sm font-medium ${!notification.isRead ? 'text-primary-800' : 'text-primary-900'}`}>
                                     {notification.title}
                                   </h4>
                                   <span className="text-xs text-neutral-400">
@@ -199,18 +199,18 @@ export const Navbar: React.FC<NavbarProps> = ({ user }) => {
                 <div className="relative">
                   <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex items-center space-x-3 px-4 py-2 rounded-lg hover:bg-neutral-100 transition-colors duration-200"
+                  className="flex items-center space-x-3 px-4 py-2 rounded-xl hover:bg-white/10 transition-colors duration-200"
                 >
-                  <div className="w-10 h-10 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white font-semibold shadow-lg">
+                  <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-white font-semibold">
                     {user.firstName[0]}{user.lastName[0]}
                   </div>
                   <div className="hidden sm:block text-left">
-                    <div className="text-sm font-semibold text-neutral-900">
+                    <div className="text-sm font-semibold text-white">
                       {user.firstName} {user.lastName}
                     </div>
-                    <div className="text-xs text-neutral-500 capitalize">{user.role}</div>
+                    <div className="text-xs text-white/70 capitalize">{user.role}</div>
                   </div>
-                  <svg className={`w-5 h-5 text-neutral-400 transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className={`w-5 h-5 text-white/80 transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
@@ -222,7 +222,7 @@ export const Navbar: React.FC<NavbarProps> = ({ user }) => {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-neutral-200 py-2"
+                      className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-primary-100 py-2 overflow-hidden"
                     >
                       <Link
                         to="/profile"
@@ -258,12 +258,14 @@ export const Navbar: React.FC<NavbarProps> = ({ user }) => {
                 <Button
                   variant="ghost"
                   onClick={() => navigate('/login')}
+                  className="text-white hover:bg-white/10 border border-white/30 rounded-xl"
                 >
                   Sign In
                 </Button>
                 <Button
                   variant="primary"
                   onClick={() => navigate('/register')}
+                  className="bg-white text-primary-800 hover:bg-white/95 rounded-xl"
                 >
                   Get Started
                 </Button>
@@ -273,7 +275,7 @@ export const Navbar: React.FC<NavbarProps> = ({ user }) => {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-neutral-100 transition-colors"
+              className="md:hidden p-2 rounded-xl hover:bg-white/10 transition-colors text-white"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {isMenuOpen ? (
@@ -293,7 +295,7 @@ export const Navbar: React.FC<NavbarProps> = ({ user }) => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden py-4 space-y-2"
+              className="md:hidden py-4 space-y-1 border-t border-white/10"
             >
               {links.map((link) => (
                 <Link
@@ -301,10 +303,10 @@ export const Navbar: React.FC<NavbarProps> = ({ user }) => {
                   to={link.path}
                   onClick={() => setIsMenuOpen(false)}
                   className={`
-                    block px-4 py-2 rounded-lg font-medium transition-all duration-200
+                    block px-4 py-2 rounded-xl font-medium transition-all duration-200
                     ${isActive(link.path)
-                      ? 'text-primary-600 bg-primary-50'
-                      : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                      ? 'text-white bg-white/15'
+                      : 'text-white/85 hover:text-white hover:bg-white/10'
                     }
                   `}
                 >
