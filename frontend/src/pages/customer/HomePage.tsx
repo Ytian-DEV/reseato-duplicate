@@ -458,15 +458,21 @@ export const HomePage: React.FC = () => {
                         }
                       `}
                     >
-                      <SimpleMap
-                        locationName="SM City Cebu"
-                        className="absolute inset-0 w-full h-full"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none flex flex-col justify-end p-4">
-                        <span className="text-white font-bold text-lg">
+                      <div className="absolute inset-0 w-full h-full">
+                        <SimpleMap
+                          locationName="SM City Cebu"
+                          className="w-full h-full"
+                        />
+                        {/* Dark mode overlay for the map */}
+                        {isDarkMode && (
+                          <div className="absolute inset-0 bg-black/60 mix-blend-multiply"></div>
+                        )}
+                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none flex flex-col justify-end p-4">
+                        <span className="text-white font-bold text-lg drop-shadow-lg">
                           SM City Cebu
                         </span>
-                        <span className="text-white/80 text-xs">
+                        <span className="text-white/90 text-xs drop-shadow-md">
                           Sachi, Chika-an, Superbowl, Mesa
                         </span>
                       </div>
@@ -502,15 +508,21 @@ export const HomePage: React.FC = () => {
                         }
                       `}
                     >
-                      <SimpleMap
-                        locationName="SM Seaside City Cebu"
-                        className="absolute inset-0 w-full h-full"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none flex flex-col justify-end p-4">
-                        <span className="text-white font-bold text-lg">
+                      <div className="absolute inset-0 w-full h-full">
+                        <SimpleMap
+                          locationName="SM Seaside City Cebu"
+                          className="w-full h-full"
+                        />
+                        {/* Dark mode overlay for the map */}
+                        {isDarkMode && (
+                          <div className="absolute inset-0 bg-black/60 mix-blend-multiply"></div>
+                        )}
+                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none flex flex-col justify-end p-4">
+                        <span className="text-white font-bold text-lg drop-shadow-lg">
                           SM Seaside
                         </span>
-                        <span className="text-white/80 text-xs">
+                        <span className="text-white/90 text-xs drop-shadow-md">
                           Cabalen, Seoul Black, Kuya J, Somac
                         </span>
                       </div>
